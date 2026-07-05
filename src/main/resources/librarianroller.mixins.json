@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "me.afk.librarianRoller.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "MixinClientPacketListener"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+  ]
+}

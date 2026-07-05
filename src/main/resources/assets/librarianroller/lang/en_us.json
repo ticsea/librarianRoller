@@ -1,0 +1,23 @@
+{
+  "afk.enchant_roller.info.turnon": "Roller: ON",
+  "afk.enchant_roller.info.turnoff": "Roller: OFF",
+  "afk.enchant_roller.info.set_lectern": "Lectern has been set",
+  "afk.enchant_roller.info.print_enchantment": " <- click it will copy the key",
+  "afk.enchant_roller.info.set_villager": "Villager has been set",
+  "afk.enchant_roller.info.obtained_enchantment": "You obtained the %1$s %2$s that cost %3$s",
+  "afk.enchant_roller.warn.low_damage": "Your axe get low duration",
+  "afk.enchant_roller.error.lectern": "Did not find lectern, please try again",
+  "afk.enchant_roller.error.set_villager_failed": "Did not fine a villager, please look at a villager and choose correct mode",
+  "afk.enchant_roller.error.interaction_failed": "Failed to interaction with villager, try again please",
+  "afk.enchant_roller.error.get_enchantment_failed": "Please make sure you take enchanted book in hand",
+  "afk.enchant_roller.error.find_lectern_failed": "Failed to find lectern, please look at a villager and choose correct mode. The current mode is %1$s",
+  "afk.enchant_roller.error.find_villager_failed": "Failed to find villager, please look at a villager and choose correct mode, The current mode is %1$s",
+  "afk.enchant_roller.error.not_enough_emerald_or_book": "There are not enough emeralds or books on the inventory",
+  "afk.enchant_roller.error.not_found_lectern": "Did not find lectern, please try again",
+
+  "text.autoconfig.librarianroller.option.autoBuy": "Enable Auto-Buy",
+  "text.autoconfig.librarianroller.option.preventAxeBreaking": "Prevent Axe Breaking",
+  "text.autoconfig.librarianroller.option.legitMode": "Legit Mode",
+  "text.autoconfig.librarianroller.option.mode": "Villager Count",
+  "text.autoconfig.librarianroller.option.entry": "Enchantment Entry"
+}

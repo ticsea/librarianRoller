@@ -1,0 +1,26 @@
+{
+  "afk.enchant_roller.error.find_lectern_failed": "未找到讲台, 请确认讲台存在并且模式是正确的。您现在的模式是 %1$s",
+  "afk.enchant_roller.error.find_villager_failed": "未找到村民，请对准村民并选择正确的模式。您现在的模式是 %1$s",
+  "afk.enchant_roller.error.get_enchantment_failed": "请确保主手手持附魔书",
+  "afk.enchant_roller.error.interaction_failed": "与村民交互失败，请重试",
+  "afk.enchant_roller.error.lectern": "未找到讲台，请重试",
+  "afk.enchant_roller.error.not_enough_emerald_or_book": "背包内绿宝石或书籍不足",
+  "afk.enchant_roller.error.set_villager_failed": "未找到村民，请对准村民并选择正确的模式",
+  "afk.enchant_roller.error.not_found_lectern": "未找到讲台，请重试",
+  "afk.enchant_roller.info.obtained_enchantment": "你获得了 %1$s %2$s，花费 %3$s",
+  "afk.enchant_roller.info.print_enchantment": " <- 点击即可复制键名",
+  "afk.enchant_roller.info.set_lectern": "已设置讲台",
+  "afk.enchant_roller.info.set_villager": "已设置村民",
+  "afk.enchant_roller.info.turnoff": "抽奖机 关闭",
+  "afk.enchant_roller.info.turnon": "抽奖机: 开启",
+  "afk.enchant_roller.warn.low_damage": "您的斧头已损耗殆尽",
+
+  "text.autoconfig.librarianroller.option.autoBuy": "启用自动购买",
+  "text.autoconfig.librarianroller.option.preventAxeBreaking": "斧头防损坏",
+  "text.autoconfig.librarianroller.option.legitMode": "安全模式",
+  "text.autoconfig.librarianroller.option.mode": "村民数量",
+  "text.autoconfig.librarianroller.option.entry": "附魔词条",
+
+  "text.autoconfig.librarianroller.option.mode@Tooltip": "该条目未敲定",
+  "text.autoconfig.librarianroller.option.entry@Tooltip": ""
+}
