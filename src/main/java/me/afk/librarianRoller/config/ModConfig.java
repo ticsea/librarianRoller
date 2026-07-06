@@ -16,6 +16,7 @@ public class ModConfig implements ConfigData {
     public boolean preventAxeBreaking = true;
     public boolean legitMode = true;
 
+    public String mode = "V1";
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
     public RollerType mode = RollerType.V1;

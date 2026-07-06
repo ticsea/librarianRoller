@@ -8,7 +8,5 @@ import net.minecraft.world.entity.npc.villager.Villager;
 *///?}
 import net.minecraft.world.phys.BlockHitResult;
 
-public record VillagerAndLectern(BlockPos lecternPos,
-                                 Villager villager,
-                                 BlockHitResult lecternBelowHitResult) {
+public record VillagerAndLectern(Villager villager, BlockPos lecternPos, BlockHitResult lecternBelowHitResult) {
 }

@@ -1,13 +1,15 @@
 package me.afk.librarianRoller;
 
+import me.afk.librarianRoller.config.ModConfig;
 import me.afk.librarianRoller.config.ModConfigManager;
-import me.afk.librarianRoller.config.RollerType;
 import me.afk.librarianRoller.utils.MessageUtils;
 import me.afk.librarianRoller.utils.PlayerInventoryUtils;
 //? if FABRIC {
+import me.afk.librarianRoller.utils.VillagerUtils;
+import me.afk.librarianRoller.utils.villagerAndLectern.IRollerMode;
+import me.afk.librarianRoller.utils.villagerAndLectern.RollerModeRegistry;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
         //?}
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
@@ -32,16 +34,13 @@ import net.minecraft.world.phys.HitResult;
 /*import net.neoforged.neoforge.client.event.ClientTickEvent;
 *///?}
 import java.util.List;
-
-
-import static me.afk.librarianRoller.config.ModConfigManager.getConfig;
-import static me.afk.librarianRoller.config.ModConfigManager.setEntry;
-import static me.afk.librarianRoller.utils.FindVillagerAndLectern.findLecternAndVillager;
-import static me.afk.librarianRoller.utils.VillagerUtils.isCorrectVillagerProfession;
-
+import java.util.Objects;
 
 public class Roller {
+    private static Roller INSTANCE;
     private static final Minecraft minecraft = Minecraft.getInstance();
+    private static ModConfigManager modConfigManager = ModConfigManager.getInstance();
+    private static ModConfig modConfig;
     private static boolean isEnabled = false;
     private static int pairIndex = 0;
     private static State state = State.IDLE;
@@ -66,48 +65,35 @@ public class Roller {
         }
 
         level = player.level();
-        var config = getConfig();
+        modConfig = modConfigManager.getConfig();
 
-        // todo does this method check villager and lectern?
-        List<VillagerAndLectern> foundVillagers = findLecternAndVillager(player, config.mode);
+        List<VillagerAndLectern> foundVillagers = RollerModeRegistry.getRollerModes().stream()
+                .filter(m -> m.getName().equals(modConfig.mode))
+                .findFirst()
+                .map(IRollerMode::find)
+                .orElse(List.of());
 
-        if (!isValidConfiguration(config.mode, foundVillagers)) {
+
+        if (foundVillagers.isEmpty()) {
+            MessageUtils.throwError("afk.enchant_roller.error.not_found_villager_or_lectern", Component.literal(modConfig.mode));
+
             stop();
             return;
         }
 
-        // Set the found villagers
         list = foundVillagers;
-        setEntry();
+        modConfigManager.setEntry();
 
-        // Validate resources for auto-buy
-        if (config.autoBuy && !hasSufficientResources(player)) {
-            stop();
+        if (modConfig.autoBuy && !hasSufficientResources(player)) {
             MessageUtils.throwError("afk.enchant_roller.error.not_enough_emerald_or_book");
+
+            stop();
+            return;
         }
 
         MessageUtils.print("afk.enchant_roller.info.turnon");
     }
 
-    private static boolean isValidConfiguration(RollerType mode, List<VillagerAndLectern> foundVillagers) {
-        if (foundVillagers.isEmpty()) {
-            return false;
-        }
-
-        int requiredCount = getRequiredVillagerCount(mode);
-        return foundVillagers.size() == requiredCount;
-    }
-
-    private static int getRequiredVillagerCount(RollerType mode) {
-        return switch (mode) {
-            case RollerType.V1 -> 1;
-            case RollerType.V4 ->  4;
-            case RollerType.V6 ->  6;
-            default -> 0;
-        };
-    }
-
-    //todo move to FindVillagerAndLecturen class.
     private static boolean hasSufficientResources(LocalPlayer player) {
         int emeraldCount = player.getInventory().countItem(Items.EMERALD);
         int bookCount = player.getInventory().countItem(Items.BOOK);
@@ -116,8 +102,8 @@ public class Roller {
 
     public static void stop() {
         isEnabled = false;
-        MessageUtils.print("afk.enchant_roller.info.turnoff");
 
+        MessageUtils.print("afk.enchant_roller.info.turnoff");
 
         // reset
         pairIndex = 0;
@@ -125,7 +111,7 @@ public class Roller {
     }
 
     public static void buy() {
-        if (ModConfigManager.getConfig().autoBuy) {
+        if (modConfig.autoBuy) {
             interactionManager.interact(player, list.get(pairIndex).villager(), InteractionHand.MAIN_HAND);
         }
     }
@@ -144,7 +130,7 @@ public class Roller {
     //?}
 
     private static void tickEvent() {
-        if (!isEnabled) return;
+        if (!isEnabled || player == null || level == null || interactionManager == null) return;
 
         Villager villager = list.get(pairIndex).villager();
 
@@ -169,7 +155,7 @@ public class Roller {
 
     private static void idle(Villager villager, LocalPlayer player) {
         //fixme it will throw nop exption when escape game.
-        if (isCorrectVillagerProfession(villager)) {
+        if (VillagerUtils.isCorrectVillagerProfession(villager)) {
             state = State.INTERACT;
 
         } else {
@@ -211,7 +197,7 @@ public class Roller {
         }
 
         stack = player.getMainHandItem();
-        if (getConfig().preventAxeBreaking) {
+        if (modConfig.preventAxeBreaking) {
             int i = stack.getMaxDamage() - stack.getDamageValue();
             if (i <= 10) {
                 MessageUtils.throwError("afk.enchant_roller.warn.low_damage");
@@ -228,7 +214,7 @@ public class Roller {
         if (blockState.getBlock() instanceof LecternBlock) {
 
             if (interactionManager.continueDestroyBlock(lecternPos, Direction.UP)) {
-            player.swing(InteractionHand.MAIN_HAND);
+                player.swing(InteractionHand.MAIN_HAND);
             }
 
         } else {
@@ -264,19 +250,6 @@ public class Roller {
         return isEnabled;
     }
 
-    public static void printReward(String translationKey, int level, int cost) {
-
-        //fixme the color always is green
-        int costColor;
-        if (cost <= 16) {
-            costColor = 5635925;
-        } else if (cost <= 32) {
-            costColor = 16777045;
-        } else {
-            costColor = 16733525;
-        }
-        MessageUtils.print("afk.enchant_roller.info.obtained_enchantment", Component.literal(translationKey).withColor(5635925), Component.literal(String.valueOf(level)).withStyle(ChatFormatting.GOLD), Component.literal(String.valueOf(cost)).withColor(costColor));
-    }
 
     enum State{
         IDLE,
