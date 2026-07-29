@@ -2,36 +2,61 @@ package me.afk.librarianRoller;
 
 import me.afk.librarianRoller.config.ModConfig;
 import me.afk.librarianRoller.config.ModConfigManager;
+import me.afk.librarianRoller.dataModel.EnchantBook;
+import me.afk.librarianRoller.dataModel.VillagerAndLectern;
 import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RollerContext {
-    private static RollerContext INSTANCE;
-
-    private final Minecraft minecraft;
+    private final MerchantPacketManager merchantPacketManager;
     private final ModConfigManager modConfigManager;
-    private final ModConfig modConfig;
     private boolean isEnabled = false;
-    private int timeToBuy;
     private int pairIndex = 0;
+    private int merchantScreenId;
     private List<VillagerAndLectern> list = new ArrayList<>();
-    private IRollerPhase rollerPhase;
+    private IRollerPhase rollerPhase = RollerPhaseInteract.INSTANCE;
+    private EnchantBook enchantBook;
 
-    private RollerContext() {
+    public RollerContext(MerchantPacketManager merchantPacketManager, ModConfigManager modConfigManager) {
+        this.merchantPacketManager = merchantPacketManager;
+
+        this.modConfigManager = modConfigManager;
+    }
+
+    public MerchantPacketManager getMerchantPacketManager() {
+        return merchantPacketManager;
+    }
+
+    public int getMerchantScreenId() {
+        return merchantScreenId;
+    }
+
+    public void setMerchantScreenId(int merchantScreenId) {
+        this.merchantScreenId = merchantScreenId;
+    }
+
+    public IRollerPhase getRollerPhase() {
+        return rollerPhase;
+    }
+
+    public EnchantBook getEnchantBook() {
+        return enchantBook;
+    }
+
+    public void setEnchantBook(EnchantBook enchantBook) {
+        this.enchantBook = enchantBook;
+    }
+
+    public void reset() {
+        this.isEnabled = false;
+        this.pairIndex = 0;
+        this.merchantScreenId = -1;
+        this.enchantBook = null;
+        this.list.clear();
         this.rollerPhase = RollerPhaseInteract.INSTANCE;
-        this.minecraft = Minecraft.getInstance();
-        this.modConfigManager = ModConfigManager.getInstance();
-        this.modConfig = modConfigManager.getConfig();
-    }
-
-    public int getTimeToBuy() {
-        return timeToBuy;
-    }
-
-    public void setTimeToBuy(int timeToBuy) {
-        this.timeToBuy = timeToBuy;
+        this.merchantPacketManager.reset();
     }
 
     public void toggle() {
@@ -47,7 +72,7 @@ public class RollerContext {
     }
 
     public Minecraft getMinecraft() {
-        return minecraft;
+        return Minecraft.getInstance();
     }
 
     public ModConfigManager getModConfigManager() {
@@ -55,7 +80,7 @@ public class RollerContext {
     }
 
     public ModConfig getModConfig() {
-        return modConfig;
+        return modConfigManager.getConfig();
     }
 
     public boolean getEnabled() {
@@ -79,18 +104,10 @@ public class RollerContext {
     }
 
     public void setList(List<VillagerAndLectern> list) {
-        this.list = list;
+        this.list = new ArrayList<>(list);;
     }
 
     public void setRollerPhase(IRollerPhase rollerPhase) {
         this.rollerPhase = rollerPhase;
-    }
-
-    public static RollerContext getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new RollerContext();
-        }
-
-        return INSTANCE;
     }
 }

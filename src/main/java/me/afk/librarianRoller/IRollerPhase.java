@@ -1,8 +1,7 @@
 package me.afk.librarianRoller;
 
 import me.afk.librarianRoller.config.ModConfig;
-import me.afk.librarianRoller.config.ModConfigManager;
-import me.afk.librarianRoller.config.ModeVType;
+import me.afk.librarianRoller.dataModel.VillagerAndLectern;
 import me.afk.librarianRoller.utils.MessageUtils;
 import me.afk.librarianRoller.utils.villagerAndLectern.IRollerMode;
 import me.afk.librarianRoller.utils.villagerAndLectern.RollerModeRegistry;
@@ -11,8 +10,8 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
+import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface IRollerPhase {
@@ -40,49 +39,33 @@ public interface IRollerPhase {
             return;
         }
 
-        ModConfigManager modConfigManager = ctx.getModConfigManager();
         ModConfig modConfig = ctx.getModConfig();
-
-        List<VillagerAndLectern> foundVillagers = RollerModeRegistry.getRollerModes().stream()
-                .filter(m -> m.getName().equals(modConfig.rollerMode))
-                .findFirst()
-                .map(IRollerMode::find)
-                .orElse(List.of());
+        List<VillagerAndLectern> foundVillagers = getFoundVillagers(modConfig);
 
 
         if (foundVillagers.isEmpty()) {
-            MessageUtils.throwError("afk.enchant_roller.error.not_found_villager_or_lectern", Component.literal(modConfig.rollerMode));
-
             stop(ctx);
+            MessageUtils.throwError("afk.enchant_roller.error.not_found_villager_or_lectern", Component.literal(modConfig.rollerMode));
             return;
         }
 
-        ctx.setPairIndex(0);
-        ctx.setList(foundVillagers);
-        modConfigManager.setEntry();
-
         if (modConfig.autoBuy) {
             if (!hasSufficientResources(player)) {
-                MessageUtils.throwError("afk.enchant_roller.error.not_enough_emerald_or_book");
-
                 stop(ctx);
+                MessageUtils.throwError("afk.enchant_roller.error.not_enough_emerald_or_book");
                 return;
-            }
-
-            //todo test
-            if (modConfig.modeVType == ModeVType.SINGLE) {
-                ctx.setTimeToBuy(1);
-            } else if (modConfig.modeVType == ModeVType.CONTINUE) {
-                int time = RollerModeRegistry.getRollerModes().stream()
-                        .filter(m -> m.getName().equals(modConfig.rollerMode))
-                        .findFirst()
-                        .map(IRollerMode::getRequireCount)
-                        .orElse(1);
-                ctx.setTimeToBuy(time);
             }
         }
 
+        OpenScreenPacketManager.INSTANCE.reset();
+        ctx.getModConfigManager().setEntry();
+        ctx.reset();
+
         MessageUtils.print("afk.enchant_roller.info.turnon");
+    }
+
+    private static @NonNull List<VillagerAndLectern> getFoundVillagers(ModConfig modConfig) {
+        return RollerModeRegistry.getRollerModes().stream().filter(m -> m.getName().equals(modConfig.rollerMode)).findFirst().map(IRollerMode::find).orElse(List.of());
     }
 
     private boolean hasSufficientResources(LocalPlayer player) {
@@ -92,11 +75,8 @@ public interface IRollerPhase {
     }
 
     default void stop(RollerContext ctx) {
-        ctx.setEnabled(false);
-
+        ctx.reset();
         MessageUtils.print("afk.enchant_roller.info.turnoff");
-
-
     }
 
     void doAction(RollerContext ctx);
