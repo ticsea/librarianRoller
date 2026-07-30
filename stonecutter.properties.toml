@@ -6,7 +6,7 @@ archives_base_name = "Librarian Roller"
 # Mod Properties
 mod.id = "librarianroller"
 mod.name = "Librarian Roller"
-mod.version = "1.0.0"
+mod.version = "1.2.0"
 mod.version_type = "beta"
 mod.description = """
 a pure client-side mod that automates breaking and placing lecterns, causing librarian villagers to continuously refresh their trades for efficient farming of specific enchanted books.
@@ -50,7 +50,7 @@ deps.mixin_extras = "0.5.0-beta.5"
 publish.enabled = true
 publish.modrinth.id = "7coPSolx"
 publish.curseforge.id = "1597584"
-publish.xyebbe.id = "40259"
+publish.xyebbs.id = "40259"
 publish.github.repository = ""
 publish.github.branch = ""
 publish.github.format = """
@@ -68,8 +68,8 @@ publish.discord.format = """
 # :camera: Minecraft - Camera Overhaul v{{version}}
 {{changelog}}
 **Download:**
-<:modrinth:1334248141024923811> [**Modrinth**](https://modrinth.com/mod/cameraoverhaul) \
-<:curseforge:1334248138214477985> [**Curseforge**](<https://curseforge.com/minecraft/mc-mods/cameraoverhaul>) \
+<:modrinth:1334248141024923811> [**Modrinth**](https://modrinth.com/mod/cameraoverhaul) \n
+<:curseforge:1334248138214477985> [**Curseforge**](<https://curseforge.com/minecraft/mc-mods/cameraoverhaul>) \n
 <:github:1334248135651885119> [**GitHub**](<https://github.com/Mirsario/Minecraft-CameraOverhaul>)
 """
 

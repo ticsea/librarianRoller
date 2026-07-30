@@ -10,7 +10,7 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -57,14 +57,15 @@ public interface IRollerPhase {
             }
         }
 
-        OpenScreenPacketManager.INSTANCE.reset();
         ctx.getModConfigManager().setEntry();
-        ctx.reset();
+        ctx.setList(foundVillagers);
+        //        OpenScreenPacketManager.INSTANCE.reset();
+        //        ctx.reset();
 
         MessageUtils.print("afk.enchant_roller.info.turnon");
     }
 
-    private static @NonNull List<VillagerAndLectern> getFoundVillagers(ModConfig modConfig) {
+    private static @NotNull List<VillagerAndLectern> getFoundVillagers(ModConfig modConfig) {
         return RollerModeRegistry.getRollerModes().stream().filter(m -> m.getName().equals(modConfig.rollerMode)).findFirst().map(IRollerMode::find).orElse(List.of());
     }
 

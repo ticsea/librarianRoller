@@ -1,5 +1,6 @@
 package me.afk.librarianRoller;
 
+import me.afk.librarianRoller.dataModel.VillagerAndLectern;
 import me.afk.librarianRoller.utils.MessageUtils;
 import me.afk.librarianRoller.utils.PlayerInventoryUtils;
 import net.minecraft.client.Minecraft;

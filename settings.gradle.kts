@@ -6,7 +6,7 @@ pluginManagement {
 		gradlePluginPortal()
 		// Stonecutter
 		maven("https://maven.kikugie.dev/releases")
-		maven("https://maven.kikugie.dev/snapshots")
+		maven("https://maven.kikugie.dev/snapshots") { name = "KikuGie Snapshots" }
 		// JvmDowngrader
 		maven("https://maven.wagyourtail.xyz/releases")
 		maven("https://maven.wagyourtail.xyz/snapshots")
@@ -25,7 +25,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.9.3"
+	id("dev.kikugie.stonecutter") version "0.9.7"
 	// This plugin will choose the necessary loom plugin conditionally.
 	// Must exist in both settings.gradle.kts as well as build.gradle.kts.
     id("dev.kikugie.loom-back-compat") version "0.3"

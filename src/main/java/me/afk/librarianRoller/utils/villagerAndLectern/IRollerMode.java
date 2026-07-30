@@ -1,20 +1,23 @@
 package me.afk.librarianRoller.utils.villagerAndLectern;
 
-import me.afk.librarianRoller.VillagerAndLectern;
+import me.afk.librarianRoller.dataModel.VillagerAndLectern;
 //? if >= 1.21.11 {
+
+/*import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
+        *///?} else {
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.VillagerProfession;
+        //?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.npc.villager.Villager;
-import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-        //?}
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -25,7 +28,13 @@ import java.util.stream.Collectors;
 // and call RollerModeRegistry.add() method in mod init.
 // if you want. you can override find() method to do what you want.
 public interface IRollerMode {
-    Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().profession().is(VillagerProfession.LIBRARIAN));
+    //todo check xp < 1 condition
+    //? if > 1.21.1 {
+    /*Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
+    *///?} else {
+    Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
+
+    //?}
     String getName();
     int getRequireCount();
     default boolean isCountValid(int count) {
@@ -98,8 +107,8 @@ public interface IRollerMode {
 
         villagers.forEach(it -> {
             BlockPos villagerFeetPos = it.blockPosition();
-            BlockPos vec = playerFeetPos.subtract(villagerFeetPos);
-            Direction cardinalDirection = getCardinalDirection(Vec3.atLowerCornerOf(vec));
+//            BlockPos vec = playerFeetPos.subtract(villagerFeetPos);
+//            Direction cardinalDirection = getCardinalDirection(Vec3.atLowerCornerOf(vec));
 
             BlockPos lecternPos = null;
             List<BlockPos> direction = List.of(villagerFeetPos.north(), villagerFeetPos.east(), villagerFeetPos.south(), villagerFeetPos.west());
@@ -120,19 +129,6 @@ public interface IRollerMode {
         return list;
     }
 
-    //fixme in V3 V5 it cannot get direction easy.it will get i do not want .
-    default Direction getCardinalDirection(Vec3 vec) {
-        double dx = vec.x();
-        double dz = vec.z();
-
-        // 判断哪个轴偏移更大
-        if (Math.abs(dx) >= Math.abs(dz)) {
-            return dx > 0 ? Direction.EAST : Direction.WEST;
-        } else {
-            return dz > 0 ? Direction.SOUTH : Direction.NORTH;
-        }
-    }
-
     default List<BlockHitResult> findBelowHitResult(List<BlockPos> lecterns) {
         List<BlockHitResult> list = new ArrayList<>();
 
@@ -148,5 +144,17 @@ public interface IRollerMode {
         });
 
         return list;
+    }
+
+    private Direction getCardinalDirection(Vec3 vec) {
+        double dx = vec.x();
+        double dz = vec.z();
+
+        // 判断哪个轴偏移更大
+        if (Math.abs(dx) >= Math.abs(dz)) {
+            return dx > 0 ? Direction.EAST : Direction.WEST;
+        } else {
+            return dz > 0 ? Direction.SOUTH : Direction.NORTH;
+        }
     }
 }

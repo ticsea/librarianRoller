@@ -2,7 +2,7 @@ package me.afk.librarianRoller;
 
 import me.afk.librarianRoller.config.ModConfig;
 import me.afk.librarianRoller.config.ModConfigManager;
-import me.afk.librarianRoller.dataModel.EnchantBook;
+import me.afk.librarianRoller.dataModel.OfferData;
 import me.afk.librarianRoller.dataModel.VillagerAndLectern;
 import net.minecraft.client.Minecraft;
 
@@ -17,7 +17,7 @@ public class RollerContext {
     private int merchantScreenId;
     private List<VillagerAndLectern> list = new ArrayList<>();
     private IRollerPhase rollerPhase = RollerPhaseInteract.INSTANCE;
-    private EnchantBook enchantBook;
+    private OfferData offerData;
 
     public RollerContext(MerchantPacketManager merchantPacketManager, ModConfigManager modConfigManager) {
         this.merchantPacketManager = merchantPacketManager;
@@ -41,19 +41,19 @@ public class RollerContext {
         return rollerPhase;
     }
 
-    public EnchantBook getEnchantBook() {
-        return enchantBook;
+    public OfferData getEnchantBook() {
+        return offerData;
     }
 
-    public void setEnchantBook(EnchantBook enchantBook) {
-        this.enchantBook = enchantBook;
+    public void setEnchantBook(OfferData offerData) {
+        this.offerData = offerData;
     }
 
     public void reset() {
         this.isEnabled = false;
         this.pairIndex = 0;
         this.merchantScreenId = -1;
-        this.enchantBook = null;
+        this.offerData = null;
         this.list.clear();
         this.rollerPhase = RollerPhaseInteract.INSTANCE;
         this.merchantPacketManager.reset();

@@ -1,12 +1,12 @@
+//? if FABRIC {
+
 package me.afk.librarianRoller.modmenuImp;
 
-//? if FABRIC {
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
+import me.afk.librarianRoller.LibrarianRoller;
+import me.afk.librarianRoller.RollerContext;
 import me.afk.librarianRoller.config.ModConfigManager;
-
-import static me.afk.librarianRoller.config.ModConfigManager.getConfigScreen;
-
 
 public class ModMenuImp implements ModMenuApi  {
     /**
@@ -18,7 +18,8 @@ public class ModMenuImp implements ModMenuApi  {
      */
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return ModConfigManager::getConfigScreen;
+        return LibrarianRoller.MODCONFIGMANAGER::getConfigScreen;
     }
 }
+
 //?}

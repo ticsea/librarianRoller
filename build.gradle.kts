@@ -11,7 +11,7 @@ plugins {
 	id("dev.kikugie.stonecutter")
 	id("xyz.wagyourtail.jvmdowngrader")
 	id("com.gradleup.shadow")
-	id("me.modmuss50.mod-publish-plugin")
+	id("me.afk.mod-publish-plugin")
 	// This plugin will choose the necessary loom plugin conditionally.
 	// Must exist in both settings.gradle.kts as well as build.gradle.kts.
     id("dev.kikugie.loom-back-compat")
@@ -160,6 +160,7 @@ dependencies {
 		// TickEvent
 		modImplementation(fabricApi.module("fabric-lifecycle-events-v1", required("deps.fabric_api")))
 		modImplementation(fabricApi.module("fabric-key-binding-api-v1", required("deps.fabric_api")))
+//		modImplementation(fabricApi.module("fabric-screen-api-v1", required("deps.fabric_api")))
 
 		// ModMenu API
 		modImplementation("com.terraformersmc:modmenu:${required("mods.modmenu.ref")}")
@@ -280,6 +281,8 @@ publishMods {
 	val curseforgeToken = localProperties.getProperty("publish.curseforge.token", "")
 	val githubToken = localProperties.getProperty("publish.github.token", "")
 	val discordWebhook = localProperties.getProperty("publish.discord.webhook${if (dryRun.get()) "_dry" else ""}", "")
+	val xyebbsKey = localProperties.getProperty("publish.xyebbs.key")
+	val xyebbsSecret = localProperties.getProperty("publish.xyebbs.secret")
 
 	fun filterFormat(str: String) = str.replace("{{version}}", versionNumbers).replace("{{changelog}}", versionChangelog)
 
@@ -287,8 +290,9 @@ publishMods {
 		projectId = required("publish.modrinth.id")
 		accessToken = modrinthToken
 		actualTargets.forEach(minecraftVersions::add)
+		environment = CLIENT_ONLY
 
-//		 Relations
+		// Relations
 		requires("cloth-config")
 		if (loader == "fabric") {
 			optional("modmenu")
@@ -299,12 +303,27 @@ publishMods {
 		accessToken = curseforgeToken
 		actualTargets.forEach(minecraftVersions::add)
 		changelogType = "markdown"
+		client.set(true)
 
 		// Relations
 		requires("cloth-config")
 		if (loader == "fabric") {
 			optional("modmenu")
 		}
+	}
+	if (isDryRun || !xyebbsKey.isNullOrBlank() || !xyebbsSecret.isNullOrBlank()) xyebbs {
+		accessToken = "xye"
+		projectId = required("publish.xyebbs.id")
+		xyeKey = xyebbsKey
+		xyeSecret = xyebbsSecret
+		actualTargets.forEach(minecraftVersions::add)
+
+		label = required("mod.version")
+		environmentType = "CLIENT"
+		orderNumber = 0
+
+		curseForgeLink("https://www.curseforge.com/minecraft/mc-mods/librarianroller")
+		modrinthLink("https://modrinth.com/mod/librarianroller")
 	}
 	// Only ran once even when chiseled.
 	if (isPrimaryBuild) {

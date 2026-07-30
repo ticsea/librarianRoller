@@ -5,19 +5,17 @@ import net.minecraft.network.protocol.game.ClientboundMerchantOffersPacket;
 import java.util.List;
 
 public class MerchantPacketManager {
-    public static final MerchantPacketManager INSTANCE = new MerchantPacketManager();
-
     // Flag: has new unprocessed merchant trade data
-    private volatile MerchantTradeData pendingTradeData = null;
+    private MerchantTradeData pendingTradeData = null;
     private MerchantTradeData latestTradeSnapshot = null;
-
-    private MerchantPacketManager(){}
 
     // Called from Mixin (Network Thread)
     public synchronized void acceptMerchantPacket(ClientboundMerchantOffersPacket rawPacket) {
         // Parse & copy data here
         MerchantTradeData data = parseRawPacket(rawPacket);
-        this.pendingTradeData = data;
+        synchronized (this) {
+            this.pendingTradeData = data;
+        }
     }
 
     // Call FROM your state machine (Main Thread)
@@ -34,7 +32,9 @@ public class MerchantPacketManager {
     }
 
     public MerchantTradeData getLatestTradeSnapshot() {
-        return latestTradeSnapshot;
+        synchronized (this) {
+            return latestTradeSnapshot;
+        }
     }
 
     public void reset() {

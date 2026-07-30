@@ -22,7 +22,7 @@ public abstract class MixinClientPacketListener {
     @Inject(method = "handleOpenScreen", at = @At("HEAD"), cancellable = true)
     private void handleOpenScreen(ClientboundOpenScreenPacket clientboundOpenScreenPacket, CallbackInfo ci) {
         //fixme there are big error witha autobuy
-        var rollerContext = RollerContext.INSTANCE;
+        var rollerContext = LibrarianRoller.ROLLERCONTEXT;
 
         if (rollerContext.getEnabled() && rollerContext.getRollerPhase() != RollerPhaseBuy.INSTANCE) {
             ClientPacketListener connection = Minecraft.getInstance().getConnection();
@@ -32,13 +32,14 @@ public abstract class MixinClientPacketListener {
 
             ci.cancel();
 
-        } else if (ModConfigManager.INSTANCE.getConfig().autoBuy && rollerContext.getRollerPhase() == RollerPhaseBuy.INSTANCE && clientboundOpenScreenPacket.getType() == MenuType.MERCHANT) {
+        } else if (LibrarianRoller.MODCONFIGMANAGER.getConfig().autoBuy && rollerContext.getRollerPhase() == RollerPhaseBuy.INSTANCE && clientboundOpenScreenPacket.getType() == MenuType.MERCHANT) {
             rollerContext.setMerchantScreenId(clientboundOpenScreenPacket.getContainerId());
         }
     }
 
     @Inject(method = "handleMerchantOffers", at = @At("TAIL"))
     private void handleMerchantOffers(ClientboundMerchantOffersPacket arg, CallbackInfo ci) {
-        MerchantPacketManager.INSTANCE.acceptMerchantPacket(arg);
+        var rollerContext = LibrarianRoller.ROLLERCONTEXT;
+        rollerContext.getMerchantPacketManager().acceptMerchantPacket(arg);
     }
 }

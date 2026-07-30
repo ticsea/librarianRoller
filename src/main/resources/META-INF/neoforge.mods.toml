@@ -30,5 +30,5 @@ mandatory = true
 
 [[dependencies."clothconfig"]]
 modId = "clothconfig"
-versionRange = "${mods.clothconfig.range}"
+versionRange = "${mods_clothconfig_range}"
 mandatory = true

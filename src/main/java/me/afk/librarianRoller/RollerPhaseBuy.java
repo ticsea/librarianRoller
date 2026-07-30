@@ -7,7 +7,13 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundSelectTradePacket;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.npc.villager.Villager;
+//? if > 1.21.1 {
+/*import net.minecraft.world.entity.npc.villager.Villager;
+*///?} else {
+
+import net.minecraft.world.entity.npc.Villager;
+        //?}
+
 import net.minecraft.world.inventory.ClickType;
 
 import java.util.List;
