@@ -18,7 +18,7 @@ public class ModMenuImp implements ModMenuApi  {
      */
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return LibrarianRoller.MODCONFIGMANAGER::getConfigScreen;
+        return LibrarianRoller.getModConfigManager()::getConfigScreen;
     }
 }
 
