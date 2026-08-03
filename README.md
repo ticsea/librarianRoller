@@ -11,7 +11,9 @@
         <img src="https://img.shields.io/curseforge/dt/1597584?style=flat-square&logo=curseforge&label=CurseForge" alt="CurseForge Downloads">
     </a>
 </p>
+
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ticsea/librarianRoller)
+
 ## Features
 
 - 🧩 **Pure Client** - Runs entirely on the client side, does not modify server data, safe and reliable
