@@ -1,7 +1,7 @@
 package me.afk.librarianRoller.utils;
 
 import me.afk.librarianRoller.LibrarianRoller;
-import me.afk.librarianRoller.RollerContext;
+import me.afk.librarianRoller.RollerTransitions;
 import me.afk.librarianRoller.config.ModConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -31,24 +31,22 @@ public class PlayerInventoryUtils {
     private static final int PLAYER_INV_OFFHAND_CONTAINER_SLOT = 45;
     private static final int HOTBAR_SIZE = 9;
 
-    public static boolean swapAxe(RollerContext ctx, LocalPlayer player) {
-        if (!(PlayerInventoryUtils.swapItem(player, EquipmentSlot.MAINHAND, itemHere -> itemHere instanceof AxeItem))){
+    public static boolean swapAxe(LocalPlayer player) {
+        if (!PlayerInventoryUtils.swapItem(player, EquipmentSlot.MAINHAND, itemHere -> itemHere instanceof AxeItem)) {
             MessageUtils.throwError("afk.enchant_roller.error.not_found_axe");
-            ctx.stop();
-
             return true;
         }
         return false;
     }
 
-    public static boolean preventAxeBreaking(RollerContext ctx, LocalPlayer player, ModConfig modConfig) {
+    public static boolean preventAxeBreaking(RollerTransitions transitions, LocalPlayer player, ModConfig modConfig) {
         boolean bl = false;
 
         var stack = player.getMainHandItem();
 
         if (!(stack.getItem() instanceof AxeItem)) {
             MessageUtils.throwError("afk.enchant_roller.error.is_not_axe");
-            ctx.stop();
+            transitions.stop();
 
             return bl;
         };
@@ -57,7 +55,7 @@ public class PlayerInventoryUtils {
             int i = stack.getMaxDamage() - stack.getDamageValue();
             if (i <= 10) {
                 MessageUtils.throwError("afk.enchant_roller.warn.low_damage");
-                ctx.stop();
+                transitions.stop();
                 bl = true;
             }
         }
@@ -78,10 +76,10 @@ public class PlayerInventoryUtils {
             MultiPlayerGameMode interactionManager = instance.gameMode;
             if (interactionManager == null) {
                 //? if > 1.21.1 {
-                /*LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().name(), handSlot);
-                *///?} else {
-                LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().getName(), handSlot);
-                //?}
+                LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().name(), handSlot);
+                //?} else {
+                /*LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().getName(), handSlot);
+                *///?}
 
                 return false;
             };
@@ -174,6 +172,9 @@ public class PlayerInventoryUtils {
             }
 
             success = true;
+            // Only handle the first matching slot - otherwise we'd keep switching the
+            // selected slot and (for OFFHAND) send multiple swap packets.
+            break;
         }
 
         return success;
@@ -181,20 +182,20 @@ public class PlayerInventoryUtils {
 
     public static int getSelect(LocalPlayer player) {
         //? if >=1.21.11 {
-        /*return player.getInventory().getSelectedSlot();
-        *///?} else {
-        return player.getInventory().selected;
-        //?}
+        return player.getInventory().getSelectedSlot();
+        //?} else {
+        /*return player.getInventory().selected;
+        *///?}
     }
 
     public static void setSelect(LocalPlayer player, int slot) {
         if (getSelect(player) == slot) return;
         //? if >=1.21.11 {
-        /*player.getInventory().setSelectedSlot(slot);
+        player.getInventory().setSelectedSlot(slot);
         player.connection.send(new ServerboundSetCarriedItemPacket(slot));
-        *///?} else {
-        player.getInventory().selected = slot;
+        //?} else {
+        /*player.getInventory().selected = slot;
         player.connection.send(new ServerboundSetCarriedItemPacket(slot));
-        //?}
+        *///?}
     }
 }
