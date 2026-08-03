@@ -4,10 +4,10 @@
 <hr>
 <p align="center">Auto Roll Trade.</p>
 <p align="center">
-    <a href="https://modrinth.com/mod/athirdhand">
+    <a href="https://modrinth.com/mod/librarianroller">
         <img src="https://img.shields.io/modrinth/dt/7coPSolx?label=Modrinth&logo=Modrinth&style=flat-square" alt="Modrinth Downloads">
     </a>
-    <a href="https://www.curseforge.com/minecraft/mc-mods/athirdhand">
+    <a href="https://www.curseforge.com/minecraft/mc-mods/librarianroller">
         <img src="https://img.shields.io/curseforge/dt/1597584?style=flat-square&logo=curseforge&label=CurseForge" alt="CurseForge Downloads">
     </a>
 </p>

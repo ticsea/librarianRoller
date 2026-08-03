@@ -57,20 +57,17 @@ publish.github.format = """
 {{changelog}}
 
 ## Links:
-- [Download from **Modrinth**](https://modrinth.com/mod/cameraoverhaul/versions)
-- [Download from **CurseForge**](https://curseforge.com/minecraft/mc-mods/cameraoverhaul/files)
-- [Chat & ask questions on **Discord**](https://discord.gg/RNGq9n8)
-- [Support me on **Patreon**](https://patreon.com/Mirsario)
+- [Download from **Modrinth**](https://modrinth.com/mod/librarianroller)
+- [Download from **CurseForge**](https://curseforge.com/minecraft/mc-mods/librarianroller)
 """
-publish.discord.username = "Please write something"
-publish.discord.avatar = "Please write something"
+publish.discord.username = "Librarian Roller"
+publish.discord.avatar = ""
 publish.discord.format = """
-# :camera: Minecraft - Camera Overhaul v{{version}}
+# Librarian Roller v{{version}}
 {{changelog}}
 **Download:**
-<:modrinth:1334248141024923811> [**Modrinth**](https://modrinth.com/mod/cameraoverhaul) \n
-<:curseforge:1334248138214477985> [**Curseforge**](<https://curseforge.com/minecraft/mc-mods/cameraoverhaul>) \n
-<:github:1334248135651885119> [**GitHub**](<https://github.com/Mirsario/Minecraft-CameraOverhaul>)
+<:modrinth:1334248141024923811> [**Modrinth**](https://modrinth.com/mod/librarianroller) \n
+<:curseforge:1334248138214477985> [**Curseforge**](<https://curseforge.com/minecraft/mc-mods/librarianroller>) \n
 """
 
 ["fabric-1.14.4"]
