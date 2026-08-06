@@ -3,12 +3,12 @@ package me.afk.librarianRoller.utils.villagerAndLectern;
 import me.afk.librarianRoller.dataModel.VillagerAndLectern;
 //? if >= 1.21.11 {
 
-/*import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
-        *///?} else {
-import net.minecraft.world.entity.npc.Villager;
+        //?} else {
+/*import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
-        //?}
+        *///?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -30,11 +30,11 @@ import java.util.stream.Collectors;
 public interface IRollerMode {
     //todo check xp < 1 condition
     //? if > 1.21.1 {
-    /*Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
-    *///?} else {
-    Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
+    Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
+    //?} else {
+    /*Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
 
-    //?}
+    *///?}
     String getName();
     int getRequireCount();
     default boolean isCountValid(int count) {
