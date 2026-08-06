@@ -2,34 +2,24 @@ package me.afk.librarianRoller;
 
 import me.afk.librarianRoller.config.ModConfig;
 import me.afk.librarianRoller.config.ModConfigManager;
-import me.afk.librarianRoller.dataModel.OfferData;
 
 /**
- * State-transition and dependency access for the state machine phases.
- * Phases depend on this narrow interface (not the full RollerContext) so they can be
- * unit-tested with a mock implementation.
+ * Dependency access for the state machine phases and their helper utilities.
+ * <p>
+ * In the event-driven design the phases do NOT perform transitions - they only
+ * emit {@link RollerEvent}s, which the {@link RollerContext} translates via the
+ * transition table. This interface therefore exposes no transition methods;
+ * it is limited to the dependencies a phase or tool needs to interact with the
+ * game world, plus {@link #stop()} which is used by stateless helpers
+ * (e.g. {@code PlayerInventoryUtils.preventAxeBreaking}).
  */
 public interface RollerTransitions {
-    // --- State transitions ---
-    void transitionTo(IRollerPhase next);
-
+    /**
+     * Stops the roller. Reserved for stateless helper utilities that detect a
+     * fatal condition before the phase has a chance to emit an event.
+     * Phases themselves should emit {@link RollerEvent.Type#FATAL} instead.
+     */
     void stop();
-
-    // --- Mutable state (set by phases) ---
-    void setEnchantBook(OfferData offerData);
-
-    void advancePair();
-
-    // --- Phase accessors (for transitions) ---
-    RollerPhaseInteract getInteract();
-
-    RollerPhaseParse getParse();
-
-    RollerPhaseBreak getBreakPhase();
-
-    RollerPhasePlace getPlace();
-
-    RollerPhaseBuy getBuy();
 
     // --- Dependency access ---
     MerchantPacketManager getMerchantPacketManager();
@@ -39,11 +29,4 @@ public interface RollerTransitions {
     ModConfig getModConfig();
 
     ScreenIntent getScreenIntent();
-
-    // --- Failure counters (P0) ---
-    void onPairFailure();
-
-    void onPairSuccess();
-
-    boolean shouldStopAfterTooManyFailures();
 }

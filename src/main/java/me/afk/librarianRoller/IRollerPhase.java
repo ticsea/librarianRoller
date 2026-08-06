@@ -2,22 +2,18 @@ package me.afk.librarianRoller;
 
 /**
  * State interface for the roller state machine (State Pattern).
- * Each concrete phase implements {@link #doAction()} and performs state transitions
- * through the injected {@link RollerTransitions}. Phases are constructed with their
- * required dependencies (narrow interfaces), so they can be unit-tested with mocks.
+ * <p>
+ * A phase is a <b>stateless pure executor</b>: it reads the injected {@link RollerState}
+ * (and, only where needed, the {@link RollerTransitions} dependency accessor), performs
+ * one tick of game interaction, and returns a {@link RollerEvent}. It never mutates
+ * state and never performs transitions - the {@link RollerContext} owns all mutable
+ * data and translates events into transitions via the transition table.
  */
 public interface IRollerPhase {
     /**
-     * Performs one tick of this phase's behavior. Uses the injected {@link RollerState}
-     * (read-only state) and {@link RollerTransitions} (transitions/dependencies).
+     * Performs one tick of this phase's behavior and returns the resulting event.
+     *
+     * @return the event describing what happened; the context maps it to a transition.
      */
-    void doAction();
-
-    /**
-     * Called by the context when the roller is started/reset. Phases with local state
-     * (e.g. pickup-wait ticks, place-failure counters) clear it here so a stop->start
-     * cycle does not leak stale counters into the next run.
-     */
-    default void onReset() {
-    }
+    RollerEvent doAction();
 }
