@@ -1,7 +1,6 @@
 package me.afk.librarianRoller;
 
-import me.afk.librarianRoller.dataModel.VillagerAndLectern;
-import me.afk.librarianRoller.utils.MessageUtils;
+import me.afk.librarianRoller.dataModel.Librarians;
 import me.afk.librarianRoller.utils.PlayerInventoryUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -16,18 +15,20 @@ import net.minecraft.world.phys.HitResult;
 
 import java.util.List;
 
+/**
+ * PLACE phase - a stateless pure executor.
+ * <p>
+ * Waits for the lectern to be back in the player's inventory, equips it in the
+ * offhand, and places it on the current villager's lectern block target. Reads
+ * the pickup-wait and place-failure counters from the context (read-only) and
+ * emits events; the context owns the counter increments and failure handling.
+ */
 public class RollerPhasePlace implements IRollerPhase {
-    // P0 (FIXME 1): how many ticks to wait for a broken lectern to enter the inventory.
     private static final int MAX_PICKUP_WAIT_TICKS = 40;
-    // P0 (FIXME 2): how many consecutive place failures before we skip the current villager.
     private static final int MAX_PLACE_FAILURES = 8;
 
     private final RollerState state;
     private final RollerTransitions transitions;
-    // P0: local state - ticks spent waiting for the lectern pickup.
-    private int pickupWaitTicks = 0;
-    // P0: local state - consecutive failed place attempts for the current villager.
-    private int placeFailures = 0;
 
     public RollerPhasePlace(RollerState state, RollerTransitions transitions) {
         this.state = state;
@@ -35,80 +36,56 @@ public class RollerPhasePlace implements IRollerPhase {
     }
 
     @Override
-    public void onReset() {
-        this.pickupWaitTicks = 0;
-        this.placeFailures = 0;
-    }
-
-    @Override
-    public void doAction() {
-        if (!state.isEnabled()) return;
+    public RollerEvent doAction() {
+        if (!state.isEnabled()) return RollerEvent.of(RollerEvent.Type.WAITING);
         Minecraft instance = state.getMinecraft();
+        if (instance == null) return RollerEvent.of(RollerEvent.Type.WAITING);
         LocalPlayer player = instance.player;
         MultiPlayerGameMode interactionManager = instance.gameMode;
         Level level = instance.level;
         int pairIndex = state.getPairIndex();
-        List<VillagerAndLectern> list = state.getList();
+        List<Librarians> list = state.getList();
 
-        if (player == null || level == null || list.isEmpty() || interactionManager == null) return;
-
+        if (player == null || level == null || list.isEmpty() || interactionManager == null) {
+            return RollerEvent.of(RollerEvent.Type.WAITING);
+        }
 
         if (!player.getOffhandItem().is(Items.LECTERN)) {
-            // P0 (FIXME 1): the lectern may not have entered the inventory yet (pickup delay).
             // Wait a short while before giving up, instead of erroring out on the first tick.
             if (!RollerUtils.hasLecternInInventory(player)) {
-                this.pickupWaitTicks++;
-                if (this.pickupWaitTicks >= MAX_PICKUP_WAIT_TICKS) {
-                    handlePairFailure();
+                // +1 accounts for the current tick: the context increments the counter
+                // AFTER this event, so the timeout fires on the 40th waiting tick.
+                if (state.getPickupWaitTicks() + 1 >= MAX_PICKUP_WAIT_TICKS) {
+                    // The lectern never came back - treat as a place failure for this pair.
+                    return RollerEvent.of(RollerEvent.Type.PLACE_FAILED);
                 }
-                return;
+                // Context increments the pickup-wait counter on WAITING.
+                return RollerEvent.of(RollerEvent.Type.WAITING);
             }
-            // P0 (FIXME 1): the lectern is in the inventory but not the offhand - swap it there.
             if (!PlayerInventoryUtils.swapItem(player, EquipmentSlot.OFFHAND, item -> item == Items.LECTERN)) {
-                MessageUtils.throwError("afk.enchant_roller.error.not_found_lectern");
-                transitions.stop();
-                return;
+                // swapItem failure: lectern vanished before it could be equipped - fatal.
+                return RollerEvent.of(RollerEvent.Type.FATAL);
             }
-            this.pickupWaitTicks = 0;
         }
 
         BlockHitResult hitResult = list.get(pairIndex).lecternBelowHitResult();
         if (hitResult.getType() == HitResult.Type.MISS) {
-            transitions.stop();
-            return;
+            return RollerEvent.of(RollerEvent.Type.FATAL);
         }
 
         var result = interactionManager.useItemOn(player, InteractionHand.OFF_HAND, hitResult);
 
         if (result == InteractionResult.SUCCESS) {
-            // P0 (FIXME 2): placing succeeded - a full villager cycle completed.
-            // Reset both the place-failure counter and the consecutive-failure counter here.
-            this.placeFailures = 0;
-            transitions.onPairSuccess();
-            transitions.advancePair();
-            transitions.transitionTo(transitions.getInteract());
+            // The context resets both the place-failure counter and the consecutive-failure
+            // counter here, then advances to the next villager.
+            return RollerEvent.of(RollerEvent.Type.PLACE_SUCCESS);
         } else {
-            // P0 (FIXME 2): placing failed (e.g. server hasn't confirmed the block is gone).
-            // Stay in the Place phase and retry, instead of bouncing to Interact forever.
-            this.placeFailures++;
-            if (this.placeFailures >= MAX_PLACE_FAILURES) {
-                handlePairFailure();
+            // Stay in the PLACE phase and retry, instead of bouncing to INTERACT forever.
+            if (state.getPlaceFailures() >= MAX_PLACE_FAILURES) {
+                return RollerEvent.of(RollerEvent.Type.PLACE_FAILED);
             }
+            // Context increments the place-failure counter on PLACE_RETRY.
+            return RollerEvent.of(RollerEvent.Type.PLACE_RETRY);
         }
-    }
-
-    // P0: record a place failure, skip the current villager and eventually give up.
-    private void handlePairFailure() {
-        this.placeFailures = 0;
-        this.pickupWaitTicks = 0;
-        transitions.onPairFailure();
-        if (transitions.shouldStopAfterTooManyFailures()) {
-            MessageUtils.throwError("afk.enchant_roller.error.lectern_place_failed");
-            transitions.stop();
-            return;
-        }
-        // Skip this pair and move on to the next villager.
-        transitions.advancePair();
-        transitions.transitionTo(transitions.getInteract());
     }
 }

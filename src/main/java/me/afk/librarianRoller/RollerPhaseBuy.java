@@ -1,23 +1,33 @@
 package me.afk.librarianRoller;
 
-import me.afk.librarianRoller.dataModel.VillagerAndLectern;
+import me.afk.librarianRoller.dataModel.Librarians;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundSelectTradePacket;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 //? if > 1.21.1 {
-import net.minecraft.world.entity.npc.villager.Villager;
-//?} else {
+/*import net.minecraft.world.entity.npc.villager.Villager;
+*///?} else {
 
-/*import net.minecraft.world.entity.npc.Villager;
-        *///?}
+import net.minecraft.world.entity.npc.Villager;
+        //?}
 
 import net.minecraft.world.inventory.ClickType;
 
 import java.util.List;
 
+/**
+ * BUY phase - a stateless pure executor.
+ * <p>
+ * Re-opens the villager's MerchantScreen (the automated interaction in INTERACT
+ * canceled it), selects the matched trade and clicks the buy button. Emits
+ * {@link RollerEvent.Type#BUY_COMPLETE} after the purchase; the context then
+ * stops the roller. While waiting for the MerchantScreen to open it emits
+ * {@link RollerEvent.Type#WAITING} (stay in BUY).
+ */
 public class RollerPhaseBuy implements IRollerPhase {
     private final RollerState state;
     private final RollerTransitions transitions;
@@ -28,33 +38,37 @@ public class RollerPhaseBuy implements IRollerPhase {
     }
 
     @Override
-    public void doAction() {
-        if (!state.isEnabled()) return;
+    public RollerEvent doAction() {
+        if (!state.isEnabled()) return RollerEvent.of(RollerEvent.Type.WAITING);
 
         Minecraft minecraft = state.getMinecraft();
+        if (minecraft == null) return RollerEvent.of(RollerEvent.Type.WAITING);
         LocalPlayer player = minecraft.player;
         MultiPlayerGameMode gameMode = minecraft.gameMode;
-        if (player == null || gameMode == null) return;
+        if (player == null || gameMode == null) return RollerEvent.of(RollerEvent.Type.WAITING);
         if (minecraft.screen instanceof MerchantScreen) {
-
             minecraft.getConnection().send(new ServerboundSelectTradePacket(state.getEnchantBook().index()));
             gameMode.handleInventoryMouseClick(state.getMerchantScreenId(), 2, 0, ClickType.PICKUP, player);
-            transitions.stop();
-            // NOTE: stop() resets the context (clears the list). Return explicitly so we
-            // don't fall through to the re-interaction below, which would otherwise run
-            // against a stale/cleared list.
-            return;
+            // The context stops the roller on BUY_COMPLETE (stop() resets the context,
+            // clearing the list - the context is the only one allowed to stop now).
+            return RollerEvent.of(RollerEvent.Type.BUY_COMPLETE);
         }
 
-
-        List<VillagerAndLectern> list = state.getList();
-        if (list.isEmpty()) return;
+        List<Librarians> list = state.getList();
+        if (list.isEmpty()) return RollerEvent.of(RollerEvent.Type.WAITING);
         int pairIndex = state.getPairIndex();
         Villager villager = list.get(pairIndex).villager();
-        if (villager == null) return;
-        // P1: signal the Mixin that this is an autoBuy re-interaction, so it lets the
+        if (villager == null) return RollerEvent.of(RollerEvent.Type.WAITING);
+        // Signal the Mixin that this is an autoBuy re-interaction, so it lets the
         // MerchantScreen through and records its container id for the purchase click.
-        transitions.getScreenIntent().setBuyScreenPending(true);
-        gameMode.interact(player, villager, InteractionHand.MAIN_HAND);
+        long epoch = transitions.getScreenIntent().set(ScreenIntent.Mode.ALLOW_AND_RECORD);
+        InteractionResult result = gameMode.interact(player, villager, InteractionHand.MAIN_HAND);
+        // If the interact fails synchronously, no OpenScreen will arrive - clear the
+        // intent so a later spurious OpenScreen cannot be mis-consumed.
+        if (result != InteractionResult.SUCCESS) {
+            transitions.getScreenIntent().consume(epoch);
+        }
+        // Stay in BUY and wait for the MerchantScreen to open next tick.
+        return RollerEvent.of(RollerEvent.Type.WAITING);
     }
 }
