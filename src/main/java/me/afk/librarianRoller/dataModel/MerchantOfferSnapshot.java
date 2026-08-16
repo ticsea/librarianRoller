@@ -30,7 +30,7 @@ public record MerchantOfferSnapshot(
             for (var book : enchantments) {
                 int lvl = book.level();
                 String name = book.name();
-                LOGGER.info("THERE ARE ENCHENMENTS: {} {}", name, lvl);
+                LOGGER.debug("THERE ARE ENCHENMENTS: {} {}", name, lvl);
 
                 Integer requiredLevel = targetEnchantments.get(name);
                 if (requiredLevel != null && lvl >= requiredLevel) {
