@@ -47,6 +47,7 @@ public class RollerPhaseBuy implements IRollerPhase {
         MultiPlayerGameMode gameMode = minecraft.gameMode;
         if (player == null || gameMode == null) return RollerEvent.of(RollerEvent.Type.WAITING);
         if (minecraft.screen instanceof MerchantScreen) {
+            if (state.getEnchantBook() == null) return RollerEvent.of(RollerEvent.Type.WAITING);
             minecraft.getConnection().send(new ServerboundSelectTradePacket(state.getEnchantBook().index()));
             gameMode.handleInventoryMouseClick(state.getMerchantScreenId(), 2, 0, ClickType.PICKUP, player);
             // The context stops the roller on BUY_COMPLETE (stop() resets the context,
