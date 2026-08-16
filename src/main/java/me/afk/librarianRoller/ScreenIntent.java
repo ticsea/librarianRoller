@@ -28,7 +28,7 @@ public class ScreenIntent {
     private volatile long epoch = 0;
 
     /** Sets an intent. Returns the epoch that must be presented at consume time. */
-    public long set(Mode mode) {
+    public synchronized long set(Mode mode) {
         this.mode = mode;
         return ++this.epoch;
     }
@@ -40,7 +40,7 @@ public class ScreenIntent {
      * @return the current mode if {@code expectedEpoch == this.epoch}, otherwise {@link Mode#NONE}
      *         (stale intent - e.g. the phase already cleared it after a failed interaction).
      */
-    public Mode consume(long expectedEpoch) {
+    public synchronized Mode consume(long expectedEpoch) {
         if (expectedEpoch != this.epoch) {
             // Stale intent (the setter already cleared it). Do not touch the current mode.
             return Mode.NONE;
@@ -51,11 +51,11 @@ public class ScreenIntent {
         return current;
     }
 
-    public Mode getMode() {
+    public synchronized Mode getMode() {
         return this.mode;
     }
 
-    public void reset() {
+    public synchronized void reset() {
         this.mode = Mode.NONE;
         this.epoch++;
     }
