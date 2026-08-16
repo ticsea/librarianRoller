@@ -7,45 +7,42 @@ import net.minecraft.world.item.trading.MerchantOffers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MerchantPacketManager {
-    // Flag: has new unprocessed merchant trade data
-    private MerchantOfferSnapshot pendingTradeData = null;
-    private MerchantOfferSnapshot latestTradeSnapshot = null;
+    // Lock-free cross-thread trade data bridge.
+    // Writer: Mixin (network thread) via acceptMerchantPacket()
+    // Reader: Main thread via tryConsumePendingTradeData()/getLatestTradeSnapshot()
+    private final AtomicReference<MerchantOfferSnapshot> pendingTradeData = new AtomicReference<>();
+    private final AtomicReference<MerchantOfferSnapshot> latestTradeSnapshot = new AtomicReference<>();
 
     // Called from Mixin (Network Thread)
     public void acceptMerchantPacket(ClientboundMerchantOffersPacket rawPacket) {
         // Parse & copy data here
         MerchantOfferSnapshot data = parseRawPacket(rawPacket);
-        synchronized (this) {
-            this.pendingTradeData = data;
-        }
+        // Atomic publish: swing-reference ensures the reader always sees a consistent snapshot.
+        pendingTradeData.set(data);
     }
 
     // Call FROM your state machine (Main Thread)
     // Consume pending data (clear pending flag after read)
     public MerchantOfferSnapshot tryConsumePendingTradeData() {
-        synchronized (this) {
-            MerchantOfferSnapshot temp = pendingTradeData;
-            pendingTradeData = null;
-            if(temp != null) {
-                latestTradeSnapshot = temp;
-            }
-            return temp;
+        // Atomic get-and-set: reader acquires the pending snapshot and atomically clears the flag.
+        MerchantOfferSnapshot temp = pendingTradeData.getAndSet(null);
+        if (temp != null) {
+            latestTradeSnapshot.set(temp);
         }
+        return temp;
     }
 
     public MerchantOfferSnapshot getLatestTradeSnapshot() {
-        synchronized (this) {
-            return latestTradeSnapshot;
-        }
+        // Atomic volatile read.
+        return latestTradeSnapshot.get();
     }
 
     public void reset() {
-        synchronized (this) {
-            pendingTradeData = null;
-            latestTradeSnapshot = null;
-        }
+        pendingTradeData.set(null);
+        latestTradeSnapshot.set(null);
     }
 
     private MerchantOfferSnapshot parseRawPacket(ClientboundMerchantOffersPacket packet) {
