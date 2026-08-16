@@ -1,4 +1,4 @@
-package me.afk.librarianRoller.utils.villagerAndLectern;
+package me.afk.librarianRoller.config;
 
 public class SimpleRollerType implements IRollerMode {
     String name;

@@ -1,18 +1,22 @@
 package me.afk.librarianRoller;
 
-import me.afk.librarianRoller.dataModel.MerchantTradeData;
+import me.afk.librarianRoller.dataModel.MerchantOfferSnapshot;
 import net.minecraft.network.protocol.game.ClientboundMerchantOffersPacket;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.item.trading.MerchantOffers;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class MerchantPacketManager {
     // Flag: has new unprocessed merchant trade data
-    private MerchantTradeData pendingTradeData = null;
-    private MerchantTradeData latestTradeSnapshot = null;
+    private MerchantOfferSnapshot pendingTradeData = null;
+    private MerchantOfferSnapshot latestTradeSnapshot = null;
 
     // Called from Mixin (Network Thread)
-    public synchronized void acceptMerchantPacket(ClientboundMerchantOffersPacket rawPacket) {
+    public void acceptMerchantPacket(ClientboundMerchantOffersPacket rawPacket) {
         // Parse & copy data here
-        MerchantTradeData data = parseRawPacket(rawPacket);
+        MerchantOfferSnapshot data = parseRawPacket(rawPacket);
         synchronized (this) {
             this.pendingTradeData = data;
         }
@@ -20,9 +24,9 @@ public class MerchantPacketManager {
 
     // Call FROM your state machine (Main Thread)
     // Consume pending data (clear pending flag after read)
-    public MerchantTradeData tryConsumePendingTradeData() {
+    public MerchantOfferSnapshot tryConsumePendingTradeData() {
         synchronized (this) {
-            MerchantTradeData temp = pendingTradeData;
+            MerchantOfferSnapshot temp = pendingTradeData;
             pendingTradeData = null;
             if(temp != null) {
                 latestTradeSnapshot = temp;
@@ -31,7 +35,7 @@ public class MerchantPacketManager {
         }
     }
 
-    public MerchantTradeData getLatestTradeSnapshot() {
+    public MerchantOfferSnapshot getLatestTradeSnapshot() {
         synchronized (this) {
             return latestTradeSnapshot;
         }
@@ -44,10 +48,14 @@ public class MerchantPacketManager {
         }
     }
 
-    private MerchantTradeData parseRawPacket(ClientboundMerchantOffersPacket packet) {
-        List<MerchantTradeData.SingleTradeEntry> entries = packet.getOffers().stream()
-                .map(MerchantTradeData.SingleTradeEntry::fromTradeOffer)
-                .toList();
-        return new MerchantTradeData(entries);
+    private MerchantOfferSnapshot parseRawPacket(ClientboundMerchantOffersPacket packet) {
+        MerchantOffers offers = packet.getOffers();
+        List<MerchantOfferSnapshot.SingleTradeEntry> entries = new ArrayList<>();
+        for (int i = 0; i < offers.size(); ++i) {
+            MerchantOffer merchantOffer = offers.get(i);
+            MerchantOfferSnapshot.SingleTradeEntry singleTradeEntry = MerchantOfferSnapshot.SingleTradeEntry.fromOffer(i, merchantOffer);
+            entries.add(singleTradeEntry);
+        }
+        return new MerchantOfferSnapshot(entries);
     }
 }

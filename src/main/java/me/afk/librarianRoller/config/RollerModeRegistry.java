@@ -1,12 +1,20 @@
-package me.afk.librarianRoller.utils.villagerAndLectern;
+package me.afk.librarianRoller.config;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Registry of available roller modes.
+ * Owned and registered by {@link ModConfigManager}.
+ */
 public class RollerModeRegistry {
-    private static final List<IRollerMode> ROLLER_MODE = new ArrayList<>();
+    private final List<IRollerMode> rollerModes = new ArrayList<>();
 
-    public static void register() {
+    /**
+     * Registers the built-in roller modes.
+     * Called by {@link ModConfigManager#registerConfig()}.
+     */
+    public void register() {
         add(new SimpleRollerType.Builder().name("V1").requireCount(1).radius(2D).build());
         add(new SimpleRollerType.Builder().name("V3").requireCount(3).radius(2D).build());
         add(new SimpleRollerType.Builder().name("V4").requireCount(4).radius(2D).build());
@@ -14,11 +22,15 @@ public class RollerModeRegistry {
         add(new SimpleRollerType.Builder().name("V6").requireCount(6).radius(5D).build());
     }
 
-    public static void add(IRollerMode mode) {
-        ROLLER_MODE.add(mode);
+    /**
+     * Adds a custom roller mode.
+     * Implement {@link IRollerMode} and call this method to register your custom mode.
+     */
+    public void add(IRollerMode mode) {
+        rollerModes.add(mode);
     }
 
-    public static List<IRollerMode> getRollerModes() {
-        return ROLLER_MODE;
+    public List<IRollerMode> getRollerModes() {
+        return rollerModes;
     }
 }

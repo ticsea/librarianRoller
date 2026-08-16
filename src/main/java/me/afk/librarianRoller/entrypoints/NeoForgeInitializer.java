@@ -9,13 +9,14 @@ import com.mojang.blaze3d.platform.InputConstants;
 import me.afk.librarianRoller.LibrarianRoller;
 import me.afk.librarianRoller.RollerContext;
 import me.afk.librarianRoller.config.ModConfigManager;
-import me.afk.librarianRoller.utils.villagerAndLectern.RollerModeRegistry;
+import me.afk.librarianRoller.utils.MessageUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 //? if >= 1.21.11 {
-/^import net.minecraft.resources.Identifier;
-^///?}
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+//?}
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.*;
 import net.neoforged.fml.common.*;
@@ -35,9 +36,8 @@ public class NeoForgeInitializer {
 	ModConfigManager modConfigManager;
 
 	public NeoForgeInitializer() {
-		rollercontext = LibrarianRoller.ROLLERCONTEXT;
-		modConfigManager = LibrarianRoller.MODCONFIGMANAGER;
-		RollerModeRegistry.register();
+		rollercontext = LibrarianRoller.getRollerContext();
+		modConfigManager = LibrarianRoller.getModConfigManager();
 		modConfigManager.registerConfig();
 
 		IEventBus eventBus = NeoForge.EVENT_BUS;
@@ -58,11 +58,11 @@ public class NeoForgeInitializer {
 
 
 	//? if >= 1.21.11 {
-	/^public static final KeyMapping.Category KEY_CATEGORY = new KeyMapping.Category(Identifier.fromNamespaceAndPath(LibrarianRoller.MOD_ID, "roller"));
-	^///?} else {
+	public static final KeyMapping.Category KEY_CATEGORY = new KeyMapping.Category(Identifier.fromNamespaceAndPath(LibrarianRoller.MOD_ID, "roller"));
+	//?} else {
 
-	public static final String KEY_CATEGORY = "Librarian Roller";
-	 //?}
+	/^public static final String KEY_CATEGORY = "Librarian Roller";
+	 ^///?}
 
 
 	public final Lazy<KeyMapping> TOGGLEKEY = Lazy.of(() ->
@@ -118,13 +118,15 @@ public class NeoForgeInitializer {
         // 使用 consumeClick() 检查按键是否被按下并消费掉本次点击事件
         while (TOGGLEKEY.get().consumeClick()) {
             // 执行你的逻辑，例如向玩家发送一条消息
-            LibrarianRoller.ROLLERCONTEXT.toggle();
+            LibrarianRoller.getRollerContext().toggle();
         }
 		while (ADDHANDENCHANTMENTKEY.get().consumeClick()) {
-			LibrarianRoller.MODCONFIGMANAGER.addHandToEntry();
+			int i = LibrarianRoller.getConfigService().addHandToEntry();
+			MessageUtils.print("afk.enchant_roller.info.added_entry", Component.literal(String.valueOf(i)));
 		}
 		while (ADDINVENTORYENCHANTMENTKEY.get().consumeClick()) {
-			modConfigManager.addAllToEntry();
+			int i = LibrarianRoller.getConfigService().addAllToEntry();
+			MessageUtils.print("afk.enchant_roller.info.added_entry", Component.literal(String.valueOf(i)));
 		}
 		while (OPENCONFIGKEY.get().consumeClick()) {
 			Screen screen = Minecraft.getInstance().screen;

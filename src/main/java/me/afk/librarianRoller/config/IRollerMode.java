@@ -1,14 +1,14 @@
-package me.afk.librarianRoller.utils.villagerAndLectern;
+package me.afk.librarianRoller.config;
 
-import me.afk.librarianRoller.dataModel.VillagerAndLectern;
+import me.afk.librarianRoller.dataModel.Librarians;
 //? if >= 1.21.11 {
 
-import net.minecraft.world.entity.npc.villager.Villager;
+/*import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
-        //?} else {
-/*import net.minecraft.world.entity.npc.Villager;
+        *///?} else {
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
-        *///?}
+        //?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -25,16 +25,15 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 // implement this interface to create your custom RollerMode
-// and call RollerModeRegistry.add() method in mod init.
+// and call ModConfigManager.getRollerModeRegistry().add() method in mod init.
 // if you want. you can override find() method to do what you want.
 public interface IRollerMode {
-    //todo check xp < 1 condition
     //? if > 1.21.1 {
-    Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
-    //?} else {
-    /*Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
+    /*Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
+    *///?} else {
+    Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
 
-    *///?}
+    //?}
     String getName();
     int getRequireCount();
     default boolean isCountValid(int count) {
@@ -43,14 +42,13 @@ public interface IRollerMode {
 
     double getRadius();
 
-    default List<VillagerAndLectern> find() {
-        List<VillagerAndLectern> list = new ArrayList<>();
+    default List<Librarians> find() {
+        List<Librarians> list = new ArrayList<>();
 
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
         LocalPlayer player = mc.player;
 
-        //todo check here saft?
         if (level == null || player == null) {
             return list;
         }
@@ -76,7 +74,7 @@ public interface IRollerMode {
 
         int requireCount = getRequireCount();
         for (int i = 0; i < requireCount; ++i) {
-            list.add(new VillagerAndLectern(villagers.get(i), lecternsPos.get(i), belowHitResults.get(i)));
+            list.add(new Librarians(villagers.get(i), lecternsPos.get(i), belowHitResults.get(i)));
         }
 
         return list;

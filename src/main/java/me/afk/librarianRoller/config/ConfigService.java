@@ -1,7 +1,7 @@
 package me.afk.librarianRoller.config;
 
 import me.afk.librarianRoller.dataModel.Enchantment;
-import me.afk.librarianRoller.utils.EnchantedBookUtils;
+import me.afk.librarianRoller.utils.ItemEnchantmentParsingUtils;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -24,9 +24,9 @@ public class ConfigService {
         if (player == null) return times;
         Inventory inventory = player.getInventory();
         //~ if >= 1.21.11 'getSelected' -> 'getSelectedItem' {
-        ItemStack item = inventory.getSelectedItem();
+        ItemStack item = inventory.getSelected();
         //~}
-        List<Enchantment> enchantments = EnchantedBookUtils.readStoredEnchantments(item);
+        List<Enchantment> enchantments = ItemEnchantmentParsingUtils.readStoredEnchantments(item);
         for (var book : enchantments) {
             if (addToEntry(book.name(), book.level())) {
                 ++times;
@@ -43,10 +43,10 @@ public class ConfigService {
         LocalPlayer player = instance.player;
         if (player == null) return times;
         //~ if>= 1.21.11 'items' -> 'getNonEquipmentItems()'{
-        NonNullList<ItemStack> stacks = player.getInventory().getNonEquipmentItems();
+        NonNullList<ItemStack> stacks = player.getInventory().items;
         //~}
         for (var item : stacks) {
-            var enchantedBooks = EnchantedBookUtils.readStoredEnchantments(item);
+            var enchantedBooks = ItemEnchantmentParsingUtils.readStoredEnchantments(item);
             for (var book : enchantedBooks) {
                 if (addToEntry(book.name(), book.level())) {
                     ++times;

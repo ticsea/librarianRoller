@@ -33,6 +33,7 @@ public class LibrarianRoller {
         return ROLLER_CONTEXT;
     }
 
-    //fixme roll过程中背包里的讲台有可能消失(可能是网络同步问题)
-    //fixme 有时候会停留在同一个村民 持续挖掘那个村民的讲台
+    // todo list
+    // sitll need to improve mixin
+    // still need to impove context
 }

@@ -11,7 +11,6 @@ import me.afk.librarianRoller.LibrarianRoller;
 import me.afk.librarianRoller.RollerContext;
 import me.afk.librarianRoller.config.ModConfigManager;
 import me.afk.librarianRoller.utils.MessageUtils;
-import me.afk.librarianRoller.utils.villagerAndLectern.RollerModeRegistry;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -74,10 +73,12 @@ public class FabricClientModInitializer implements ClientModInitializer {
 				rollercontext.toggle();
 			}
 			while (addHandEnchantmentKey.consumeClick()) {
-				LibrarianRoller.MODCONFIGMANAGER.addHandToEntry();
+				int i = LibrarianRoller.getConfigService().addHandToEntry();
+				MessageUtils.print("afk.enchant_roller.info.added_entry", Component.literal(String.valueOf(i)));
 			}
 			while (addInventoryEnchantmentKey.consumeClick()) {
-				modConfigManager.addAllToEntry();
+				int i = LibrarianRoller.getConfigService().addAllToEntry();
+				MessageUtils.print("afk.enchant_roller.info.added_entry", Component.literal(String.valueOf(i)));
 			}
 			while (openConfigKey.consumeClick()) {
 				Screen screen = Minecraft.getInstance().screen;
@@ -91,9 +92,8 @@ public class FabricClientModInitializer implements ClientModInitializer {
 	 */
 	@Override
 	public void onInitializeClient() {
-		this.rollercontext = LibrarianRoller.ROLLERCONTEXT;
-		this.modConfigManager = LibrarianRoller.MODCONFIGMANAGER;
-		RollerModeRegistry.register();
+		this.rollercontext = LibrarianRoller.getRollerContext();
+		this.modConfigManager = LibrarianRoller.getModConfigManager();
 		modConfigManager.registerConfig();
 
 		key();

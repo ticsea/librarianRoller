@@ -1,7 +1,6 @@
 package me.afk.librarianRoller.utils;
 
 import me.afk.librarianRoller.LibrarianRoller;
-import me.afk.librarianRoller.RollerTransitions;
 import me.afk.librarianRoller.config.ModConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -34,13 +33,14 @@ public class PlayerInventoryUtils {
     public static boolean swapAxe(LocalPlayer player) {
         if (!PlayerInventoryUtils.swapItem(player, EquipmentSlot.MAINHAND, itemHere -> itemHere instanceof AxeItem)) {
             MessageUtils.throwError("afk.enchant_roller.error.not_found_axe");
-            return true;
+            return false;
         }
-        return false;
+
+        return true;
     }
 
     public static boolean preventAxeBreaking(RollerTransitions transitions, LocalPlayer player, ModConfig modConfig) {
-        boolean bl = false;
+        boolean shouldStop = true;
 
         var stack = player.getMainHandItem();
 
@@ -48,7 +48,7 @@ public class PlayerInventoryUtils {
             MessageUtils.throwError("afk.enchant_roller.error.is_not_axe");
             transitions.stop();
 
-            return bl;
+            return shouldStop;
         };
 
         if (modConfig.preventAxeBreaking) {
@@ -56,11 +56,11 @@ public class PlayerInventoryUtils {
             if (i <= 10) {
                 MessageUtils.throwError("afk.enchant_roller.warn.low_damage");
                 transitions.stop();
-                bl = true;
+                shouldStop = true;
             }
         }
 
-        return bl;
+        return shouldStop;
     }
 
     public static boolean swapItem(LocalPlayer player, EquipmentSlot handSlot, Predicate<Item> predicate) {
@@ -76,10 +76,10 @@ public class PlayerInventoryUtils {
             MultiPlayerGameMode interactionManager = instance.gameMode;
             if (interactionManager == null) {
                 //? if > 1.21.1 {
-                LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().name(), handSlot);
-                //?} else {
-                /*LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().getName(), handSlot);
-                *///?}
+                /*LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().name(), handSlot);
+                *///?} else {
+                LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().getName(), handSlot);
+                //?}
 
                 return false;
             };
@@ -145,6 +145,7 @@ public class PlayerInventoryUtils {
             player.containerMenu.broadcastChanges();
 
             success = true;
+            break;
         }
 
         return success;
@@ -182,20 +183,20 @@ public class PlayerInventoryUtils {
 
     public static int getSelect(LocalPlayer player) {
         //? if >=1.21.11 {
-        return player.getInventory().getSelectedSlot();
-        //?} else {
-        /*return player.getInventory().selected;
-        *///?}
+        /*return player.getInventory().getSelectedSlot();
+        *///?} else {
+        return player.getInventory().selected;
+        //?}
     }
 
     public static void setSelect(LocalPlayer player, int slot) {
         if (getSelect(player) == slot) return;
         //? if >=1.21.11 {
-        player.getInventory().setSelectedSlot(slot);
+        /*player.getInventory().setSelectedSlot(slot);
         player.connection.send(new ServerboundSetCarriedItemPacket(slot));
-        //?} else {
-        /*player.getInventory().selected = slot;
+        *///?} else {
+        player.getInventory().selected = slot;
         player.connection.send(new ServerboundSetCarriedItemPacket(slot));
-        *///?}
+        //?}
     }
 }
