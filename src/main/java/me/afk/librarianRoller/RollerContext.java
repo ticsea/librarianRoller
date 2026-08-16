@@ -22,6 +22,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 /**
  * Context of the roller state machine (classic State Pattern, event-driven).
@@ -58,8 +59,19 @@ public class RollerContext implements RollerState, RollerTransitions {
     // State-machine state.
     private boolean isEnabled = false;
     private int pairIndex = 0;
-    private int merchantScreenId = -1;
+    private volatile int merchantScreenId = -1;
     private List<Librarians> list = new ArrayList<>();
+
+    // Defensive: prevent live collection exposure across threads.
+    @Override
+    public List<Librarians> getList() {
+        return Collections.unmodifiableList(list);
+    }
+
+    @Override
+    public Map<String, Integer> getEntry() {
+        return Collections.unmodifiableMap(entryCache);
+    }
     private RollerPhase currentPhase = RollerPhase.INTERACT;
     private MerchantOfferSnapshot.SingleTradeEntry offerData;
     // Parsed enchantment target map (cached at roller start).
