@@ -26,6 +26,10 @@ public record RollerEvent(Type type, MerchantOfferSnapshot.SingleTradeEntry matc
         // PARSE
         TRADE_MATCHED,  // Carries the matched trade as payload.
         NO_TRADE_MATCH,
+        // Waited too long for the merchant-offers packet without ever receiving a
+        // snapshot (see RollerPhaseParse). The context bails out to BREAK instead
+        // of stalling in PARSE forever.
+        PARSE_TIMEOUT,
 
         // BREAK
         BREAKING,       // Still destroying the lectern - do not count pickup wait.

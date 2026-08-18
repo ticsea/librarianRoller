@@ -82,6 +82,8 @@ public class RollerContext implements RollerState, RollerTransitions {
     // Tick-counting state, owned here so the phases stay stateless.
     private int pickupWaitTicks = 0;
     private int placeFailures = 0;
+    // Ticks spent in PARSE waiting for the merchant-offers packet (timeout guard).
+    private int parseWaitTicks = 0;
 
     public RollerContext(MerchantPacketManager merchantPacketManager, ModConfigManager modConfigManager) {
         this.merchantPacketManager = merchantPacketManager;
@@ -104,16 +106,23 @@ public class RollerContext implements RollerState, RollerTransitions {
         table.put(RollerPhase.INTERACT, row(
                 event(RollerEvent.Type.WAITING, Transition.to(RollerPhase.INTERACT)),
                 event(RollerEvent.Type.INTERACT_FAILED, Transition.to(RollerPhase.INTERACT)),
-                event(RollerEvent.Type.INTERACT_SUCCESS, Transition.to(RollerPhase.PARSE)),
+                event(RollerEvent.Type.INTERACT_SUCCESS, Transition.to(RollerPhase.PARSE, RollerContext::resetParseWait)),
                 event(RollerEvent.Type.LECTERN_MISSING, Transition.to(RollerPhase.PLACE)),
                 event(RollerEvent.Type.FATAL, Transition.to(RollerPhase.STOP))
         ));
         table.put(RollerPhase.PARSE, row(
-                event(RollerEvent.Type.WAITING, Transition.to(RollerPhase.PARSE)),
+                event(RollerEvent.Type.WAITING, Transition.to(RollerPhase.PARSE, RollerContext::incrementParseWait)),
                 // TRADE_MATCHED handled in #handleEvent (payload); the table only
                 // decides the destination (autoBuy -> BUY, otherwise STOP).
                 event(RollerEvent.Type.TRADE_MATCHED, Transition.to(ctx -> ctx.getModConfig().autoBuy ? RollerPhase.BUY : RollerPhase.STOP)),
                 event(RollerEvent.Type.NO_TRADE_MATCH, Transition.to(RollerPhase.BREAK)),
+                // The merchant-offers packet never arrived (villager lost its profession on the
+                // server, dropped packet, plugin interference...). Bail to BREAK to re-place the
+                // lectern and re-roll the SAME villager; give up entirely after too many failures.
+                event(RollerEvent.Type.PARSE_TIMEOUT, Transition.to(
+                        ctx -> ctx.shouldStopAfterTooManyFailures() ? RollerPhase.STOP : RollerPhase.BREAK,
+                        RollerContext::failPairParse
+                )),
                 event(RollerEvent.Type.FATAL, Transition.to(RollerPhase.STOP))
         ));
         table.put(RollerPhase.BREAK, row(
@@ -170,6 +179,14 @@ public class RollerContext implements RollerState, RollerTransitions {
         this.placeFailures++;
     }
 
+    private void incrementParseWait() {
+        this.parseWaitTicks++;
+    }
+
+    private void resetParseWait() {
+        this.parseWaitTicks = 0;
+    }
+
     /**
      * P0: record a pickup failure, skip the current villager and eventually give up.
      */
@@ -184,9 +201,25 @@ public class RollerContext implements RollerState, RollerTransitions {
         failPair("afk.enchant_roller.error.lectern_place_failed");
     }
 
+    /**
+     * P0: the merchant-offers packet never arrived within PARSE's timeout.
+     * Wipe any late snapshot and record the failure. Unlike {@link #failPair} this
+     * does NOT advance the pair - the BREAK transition re-rolls the SAME villager
+     * by re-placing its lectern.
+     */
+    private void failPairParse() {
+        this.merchantPacketManager.reset();
+        this.parseWaitTicks = 0;
+        this.onPairFailure();
+        if (this.shouldStopAfterTooManyFailures()) {
+            MessageUtils.throwError("afk.enchant_roller.error.trade_data_timeout");
+        }
+    }
+
     private void failPair(String errorKey) {
         this.pickupWaitTicks = 0;
         this.placeFailures = 0;
+        this.parseWaitTicks = 0;
         this.onPairFailure();
         if (this.shouldStopAfterTooManyFailures()) {
             MessageUtils.throwError(errorKey);
@@ -257,6 +290,22 @@ public class RollerContext implements RollerState, RollerTransitions {
     }
 
     private IRollerPhase executorOf(RollerPhase phase) {
+        //? if FORGE {
+        /*if (phase == RollerPhase.INTERACT) {
+            return interact;
+        } else if (phase == RollerPhase.PARSE) {
+            return parse;
+        } else if (phase == RollerPhase.BREAK) {
+            return breakPhase;
+        } else if (phase == RollerPhase.PLACE) {
+            return place;
+        } else if (phase == RollerPhase.BUY) {
+            return buy;
+        } else if (phase == RollerPhase.STOP) {
+            return null;
+        }
+        return null;
+        *///?} else {
         return switch (phase) {
             case INTERACT -> interact;
             case PARSE -> parse;
@@ -265,6 +314,7 @@ public class RollerContext implements RollerState, RollerTransitions {
             case BUY -> buy;
             case STOP -> null; // unreachable: STOP is never executed
         };
+        //?}
     }
 
     // --- RollerState (read-only) ---
@@ -276,11 +326,6 @@ public class RollerContext implements RollerState, RollerTransitions {
     @Override
     public int getPairIndex() {
         return pairIndex;
-    }
-
-    @Override
-    public List<Librarians> getList() {
-        return list;
     }
 
     @Override
@@ -304,13 +349,13 @@ public class RollerContext implements RollerState, RollerTransitions {
     }
 
     @Override
-    public Map<String, Integer> getEntry() {
-        return entryCache;
+    public int getPickupWaitTicks() {
+        return pickupWaitTicks;
     }
 
     @Override
-    public int getPickupWaitTicks() {
-        return pickupWaitTicks;
+    public int getParseWaitTicks() {
+        return parseWaitTicks;
     }
 
     @Override
@@ -429,6 +474,12 @@ public class RollerContext implements RollerState, RollerTransitions {
         this.consecutiveFailures = 0;
         this.pickupWaitTicks = 0;
         this.placeFailures = 0;
+        this.parseWaitTicks = 0;
+        // Clear any trade snapshot left over from manual trading while the roller was
+        // stopped - otherwise the first PARSE round could match against stale data.
+        // Symmetric cleanup for the screen-intent flag (defensive, idempotent).
+        this.merchantPacketManager.reset();
+        this.screenIntent.reset();
         this.isEnabled = true;
         this.currentPhase = RollerPhase.INTERACT;
 
@@ -459,6 +510,7 @@ public class RollerContext implements RollerState, RollerTransitions {
         this.currentPhase = RollerPhase.INTERACT;
         this.pickupWaitTicks = 0;
         this.placeFailures = 0;
+        this.parseWaitTicks = 0;
         this.consecutiveFailures = 0;
         this.merchantPacketManager.reset();
         this.screenIntent.reset();

@@ -1,6 +1,7 @@
 package me.afk.librarianRoller;
 
 import me.afk.librarianRoller.dataModel.Librarians;
+import me.afk.librarianRoller.utils.InteractionUtils;
 import me.afk.librarianRoller.utils.PlayerInventoryUtils;
 import me.afk.librarianRoller.utils.VillagerUtils;
 import net.minecraft.client.Minecraft;
@@ -10,14 +11,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 //? if > 1.21.1 {
-/*import net.minecraft.world.entity.npc.villager.Villager;
-*///?} else {
+import net.minecraft.world.entity.npc.villager.Villager;
+//?} else {
 
-import net.minecraft.world.entity.npc.Villager;
-        //?}
+/*import net.minecraft.world.entity.npc.Villager;
+        *///?}
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.EntityHitResult;
 
 import java.util.List;
 
@@ -73,14 +75,20 @@ public class RollerPhaseInteract implements IRollerPhase {
         if (villager == null || !VillagerUtils.isLibrarian(villager)) return RollerEvent.of(RollerEvent.Type.WAITING);
 
         if (!PlayerInventoryUtils.swapAxe(player)) {
-            // No axe available right now - stay in INTERACT and retry next tick.
-            return RollerEvent.of(RollerEvent.Type.WAITING);
+            // No axe available right now - stop.
+            return RollerEvent.of(RollerEvent.Type.FATAL);
         }
+
+        // Invalidate any stale trade snapshot BEFORE interacting: only the offers from
+        // THIS interaction may be parsed by PARSE. A leftover snapshot (from manual
+        // trading while stopped, or from the previous villager round) would otherwise
+        // be matched against the wrong villager (or stall matching entirely).
+        transitions.getMerchantPacketManager().reset();
 
         // Signal the Mixin that an automated interaction is in flight, so it cancels
         // the resulting OpenScreen (the roller runs headless).
         long epoch = transitions.getScreenIntent().set(ScreenIntent.Mode.CANCEL);
-        InteractionResult result = gameMode.interact(player, villager, InteractionHand.MAIN_HAND);
+        InteractionResult result = InteractionUtils.interactVillager(player, villager);
         player.swing(InteractionHand.MAIN_HAND);
 
         if (result == InteractionResult.SUCCESS) {

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MerchantPacketManager {
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger("MerchantPacketManager");
     // Lock-free cross-thread trade data bridge.
     // Writer: Mixin (network thread) via acceptMerchantPacket()
     // Reader: Main thread via tryConsumePendingTradeData()/getLatestTradeSnapshot()
@@ -21,6 +22,8 @@ public class MerchantPacketManager {
         // Parse & copy data here
         MerchantOfferSnapshot data = parseRawPacket(rawPacket);
         // Atomic publish: swing-reference ensures the reader always sees a consistent snapshot.
+        // Diagnostic: confirm the packet actually reaches the writer.
+        LOGGER.info("[Roller] acceptMerchantPacket -> publishing {} offers to pendingTradeData", data.offers().size());
         pendingTradeData.set(data);
     }
 

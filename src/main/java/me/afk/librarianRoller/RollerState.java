@@ -41,6 +41,14 @@ public interface RollerState {
     int getPickupWaitTicks();
 
     /**
+     * Ticks spent in PARSE waiting for the merchant-offers packet to arrive after a
+     * successful interaction. Read by {@link RollerPhaseParse}; incremented by the
+     * context on WAITING so a never-arriving packet times out into BREAK (self-heal)
+     * instead of stalling the machine forever.
+     */
+    int getParseWaitTicks();
+
+    /**
      * Consecutive failed place attempts for the current villager.
      * Read by {@link RollerPhasePlace}; incremented by the context.
      */
