@@ -53,8 +53,8 @@ public class RollerPhaseBreak implements IRollerPhase {
             return RollerEvent.of(RollerEvent.Type.WAITING);
         }
         if (!PlayerInventoryUtils.swapAxe(player)) {
-            // No axe available right now - stay in BREAK and retry next tick.
-            return RollerEvent.of(RollerEvent.Type.WAITING);
+            // No axe available right now - stop.
+            return RollerEvent.of(RollerEvent.Type.FATAL);
         }
         if (PlayerInventoryUtils.preventAxeBreaking(player, modConfig)) {
             // Pure detection - the phase emits FATAL and the context stops the roller.

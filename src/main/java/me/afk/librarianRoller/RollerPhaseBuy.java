@@ -1,6 +1,8 @@
 package me.afk.librarianRoller;
 
 import me.afk.librarianRoller.dataModel.Librarians;
+import me.afk.librarianRoller.utils.InteractionUtils;
+import me.afk.librarianRoller.utils.PlayerInventoryUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -9,13 +11,17 @@ import net.minecraft.network.protocol.game.ServerboundSelectTradePacket;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 //? if > 1.21.1 {
-/*import net.minecraft.world.entity.npc.villager.Villager;
-*///?} else {
+import net.minecraft.world.entity.npc.villager.Villager;
+//?} else {
 
-import net.minecraft.world.entity.npc.Villager;
-        //?}
+/*import net.minecraft.world.entity.npc.Villager;
+        *///?}
 
+//~ if >= 26.1 'ClickType' -> 'ContainerInput' {
 import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.phys.EntityHitResult;
+        //~}
 
 import java.util.List;
 
@@ -46,10 +52,12 @@ public class RollerPhaseBuy implements IRollerPhase {
         LocalPlayer player = minecraft.player;
         MultiPlayerGameMode gameMode = minecraft.gameMode;
         if (player == null || gameMode == null) return RollerEvent.of(RollerEvent.Type.WAITING);
+        //~ if >= 26.2 'screen' -> 'gui.screen()'
         if (minecraft.screen instanceof MerchantScreen) {
             if (state.getEnchantBook() == null) return RollerEvent.of(RollerEvent.Type.WAITING);
             minecraft.getConnection().send(new ServerboundSelectTradePacket(state.getEnchantBook().index()));
-            gameMode.handleInventoryMouseClick(state.getMerchantScreenId(), 2, 0, ClickType.PICKUP, player);
+            PlayerInventoryUtils.containerInput(state.getMerchantScreenId(), 2, 0, player);
+
             // The context stops the roller on BUY_COMPLETE (stop() resets the context,
             // clearing the list - the context is the only one allowed to stop now).
             return RollerEvent.of(RollerEvent.Type.BUY_COMPLETE);
@@ -63,7 +71,8 @@ public class RollerPhaseBuy implements IRollerPhase {
         // Signal the Mixin that this is an autoBuy re-interaction, so it lets the
         // MerchantScreen through and records its container id for the purchase click.
         long epoch = transitions.getScreenIntent().set(ScreenIntent.Mode.ALLOW_AND_RECORD);
-        InteractionResult result = gameMode.interact(player, villager, InteractionHand.MAIN_HAND);
+        InteractionResult result = InteractionUtils.interactVillager(player, villager);
+
         // If the interact fails synchronously, no OpenScreen will arrive - clear the
         // intent so a later spurious OpenScreen cannot be mis-consumed.
         if (result != InteractionResult.SUCCESS) {
