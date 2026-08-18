@@ -1,6 +1,7 @@
 package me.afk.librarianRoller.utils;
-
+//~ if >= 26.1 'ClickType' -> 'ContainerInput' {
 import me.afk.librarianRoller.LibrarianRoller;
+import me.afk.librarianRoller.RollerTransitions;
 import me.afk.librarianRoller.config.ModConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -39,28 +40,29 @@ public class PlayerInventoryUtils {
         return true;
     }
 
-    public static boolean preventAxeBreaking(RollerTransitions transitions, LocalPlayer player, ModConfig modConfig) {
-        boolean shouldStop = true;
+    public static boolean preventAxeBreaking(LocalPlayer player, ModConfig modConfig) {
+//        boolean shouldStop = true;
 
         var stack = player.getMainHandItem();
 
         if (!(stack.getItem() instanceof AxeItem)) {
             MessageUtils.throwError("afk.enchant_roller.error.is_not_axe");
-            transitions.stop();
+//            transitions.stop();
 
-            return shouldStop;
+//            return shouldStop;
+            return true;
         };
 
         if (modConfig.preventAxeBreaking) {
             int i = stack.getMaxDamage() - stack.getDamageValue();
             if (i <= 10) {
                 MessageUtils.throwError("afk.enchant_roller.warn.low_damage");
-                transitions.stop();
-                shouldStop = true;
+//                transitions.stop();
+                return true;
             }
         }
 
-        return shouldStop;
+        return false;
     }
 
     public static boolean swapItem(LocalPlayer player, EquipmentSlot handSlot, Predicate<Item> predicate) {
@@ -76,10 +78,10 @@ public class PlayerInventoryUtils {
             MultiPlayerGameMode interactionManager = instance.gameMode;
             if (interactionManager == null) {
                 //? if > 1.21.1 {
-                /*LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().name(), handSlot);
-                *///?} else {
-                LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().getName(), handSlot);
-                //?}
+                LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().name(), handSlot);
+                //?} else {
+                /*LOGGER.error("GameMode null, player={}, slot={}", player.getGameProfile().getName(), handSlot);
+                *///?}
 
                 return false;
             };
@@ -116,14 +118,14 @@ public class PlayerInventoryUtils {
 
             //here is mess.
             boolean hasHandItem = !player.getItemBySlot(handSlot).isEmpty();
-            interactionManager.handleInventoryMouseClick(
+            containerInput(
                     player.containerMenu.containerId,
                     i,
                     0,
                     ClickType.PICKUP,
                     player
             );
-            interactionManager.handleInventoryMouseClick(
+            containerInput(
                     player.containerMenu.containerId,
                     targetSlot,
                     0,
@@ -132,7 +134,7 @@ public class PlayerInventoryUtils {
             );
 
             if (hasHandItem && inventory.getItem(slot).isEmpty()) {
-                interactionManager.handleInventoryMouseClick(
+                containerInput(
                         player.containerMenu.containerId,
                         i,
                         0,
@@ -149,6 +151,37 @@ public class PlayerInventoryUtils {
         }
 
         return success;
+    }
+
+    public static void containerInput(
+            int containerId,
+            int slot,
+            int button,
+            ClickType action,
+            LocalPlayer player
+    ) {
+        MultiPlayerGameMode gameMode = Minecraft.getInstance().gameMode;
+        if (gameMode == null) return;
+        //? if >= 26.1 {
+        /*gameMode.handleClickType(containerId, slot, button, action, player);
+        *///?} else {
+        gameMode.handleInventoryMouseClick(containerId, slot, button, action, player);
+        //?}
+    }
+
+    public static void containerInput(
+            int containerId,
+            int slot,
+            int button,
+            LocalPlayer player
+    ) {
+        MultiPlayerGameMode gameMode = Minecraft.getInstance().gameMode;
+        if (gameMode == null) return;
+        //? if >= 26.1 {
+        /*gameMode.handleClickType(containerId, slot, button, ClickType.PICKUP, player);
+        *///?} else {
+        gameMode.handleInventoryMouseClick(containerId, slot, button, ClickType.PICKUP, player);
+         //?}
     }
 
     private static boolean swapFromHotbar(LocalPlayer player, EquipmentSlot handSlot, Predicate<Item> predicate) {
@@ -183,20 +216,21 @@ public class PlayerInventoryUtils {
 
     public static int getSelect(LocalPlayer player) {
         //? if >=1.21.11 {
-        /*return player.getInventory().getSelectedSlot();
-        *///?} else {
-        return player.getInventory().selected;
-        //?}
+        return player.getInventory().getSelectedSlot();
+        //?} else {
+        /*return player.getInventory().selected;
+        *///?}
     }
 
     public static void setSelect(LocalPlayer player, int slot) {
         if (getSelect(player) == slot) return;
         //? if >=1.21.11 {
-        /*player.getInventory().setSelectedSlot(slot);
+        player.getInventory().setSelectedSlot(slot);
         player.connection.send(new ServerboundSetCarriedItemPacket(slot));
-        *///?} else {
-        player.getInventory().selected = slot;
+        //?} else {
+        /*player.getInventory().selected = slot;
         player.connection.send(new ServerboundSetCarriedItemPacket(slot));
-        //?}
+        *///?}
     }
 }
+//~}

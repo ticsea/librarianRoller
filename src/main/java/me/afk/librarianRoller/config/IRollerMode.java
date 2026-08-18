@@ -3,12 +3,12 @@ package me.afk.librarianRoller.config;
 import me.afk.librarianRoller.dataModel.Librarians;
 //? if >= 1.21.11 {
 
-/*import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
-        *///?} else {
-import net.minecraft.world.entity.npc.Villager;
+        //?} else {
+/*import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
-        //?}
+        *///?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -29,11 +29,11 @@ import java.util.stream.Collectors;
 // if you want. you can override find() method to do what you want.
 public interface IRollerMode {
     //? if > 1.21.1 {
-    /*Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
-    *///?} else {
-    Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
+    Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
+    //?} else {
+    /*Predicate<Villager> isValidVillager = it -> (it.isAlive() && it.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && it.getVillagerXp() < 1);
 
-    //?}
+    *///?}
     String getName();
     int getRequireCount();
     default boolean isCountValid(int count) {
@@ -89,7 +89,11 @@ public interface IRollerMode {
                 .collect(Collectors.toList());
 
         while (entitiesOfClass.size() > getRequireCount()) {
+            //? if FORGE {
+            /*entitiesOfClass.remove(entitiesOfClass.size() - 1);
+            *///?} else {
             entitiesOfClass.removeLast();
+            //?}
         }
 
         if (!isCountValid(entitiesOfClass.size())) return list;

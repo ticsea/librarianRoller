@@ -2,8 +2,8 @@ package me.afk.librarianRoller.config;
 
 import me.shedaniel.autoconfig.AutoConfig;
 //? if >= 1.21.11 {
-/*import me.shedaniel.autoconfig.AutoConfigClient;
-*///?}
+import me.shedaniel.autoconfig.AutoConfigClient;
+//?}
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.client.gui.screens.Screen;
@@ -24,7 +24,7 @@ public class ModConfigManager {
         AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
 
         //~ if >= 1.21.11 'AutoConfig' -> 'AutoConfigClient' {
-        AutoConfig.getGuiRegistry(ModConfig.class).registerPredicateProvider(
+        AutoConfigClient.getGuiRegistry(ModConfig.class).registerPredicateProvider(
                 (i18n, field, config, defaults, registry) -> {
                     ModConfig modConfig = (ModConfig) config;
                     IRollerMode[] allModes = rollerModeRegistry.getRollerModes().toArray(new IRollerMode[0]);
@@ -63,10 +63,10 @@ public class ModConfigManager {
 
     public Screen getConfigScreen(Screen p) {
         //? if >= 1.21.11 {
-        /*return AutoConfigClient.getConfigScreen(ModConfig.class, p).get();
-        *///?} else {
-        return AutoConfig.getConfigScreen(ModConfig.class, p).get();
-         //?}
+        return AutoConfigClient.getConfigScreen(ModConfig.class, p).get();
+        //?} else {
+        /*return AutoConfig.getConfigScreen(ModConfig.class, p).get();
+         *///?}
     }
 
 }

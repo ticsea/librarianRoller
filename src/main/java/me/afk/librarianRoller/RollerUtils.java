@@ -17,7 +17,7 @@ public final class RollerUtils {
         if (player == null) return false;
         if (player.getOffhandItem().is(Items.LECTERN)) return true;
         //~ if >= 1.21.11 'items' -> 'getNonEquipmentItems()' {
-        for (ItemStack stack : player.getInventory().items) {
+        for (ItemStack stack : player.getInventory().getNonEquipmentItems()) {
             //~}
             if (stack.is(Items.LECTERN)) return true;
         }

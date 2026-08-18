@@ -11,22 +11,26 @@ public class MessageUtils {
     public static void throwError(String translatableKey, Component... component) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
-        //? if >=1.21.11 {
-        /*player.displayClientMessage(Component.translatable(translatableKey, (Object[]) component).withStyle(ChatFormatting.RED), false);
-        *///?} elif >= 1.20.1 {
-        player.sendSystemMessage(Component.translatable(translatableKey, (Object[]) component).withStyle(ChatFormatting.RED));
-        //?}
+        //? if >= 26.1 {
+        /*player.sendSystemMessage(Component.translatable(translatableKey, (Object[]) component).withStyle(ChatFormatting.RED));
+        *///?} elif >=1.21.11 {
+        player.displayClientMessage(Component.translatable(translatableKey, (Object[]) component).withStyle(ChatFormatting.RED), false);
+        //?} elif >= 1.20.1 {
+        /*player.sendSystemMessage(Component.translatable(translatableKey, (Object[]) component).withStyle(ChatFormatting.RED));
+        *///?}
 
     }
 
     public static void print(String translatableKey, Component... component) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
-        //? if >= 1.21.11 {
-        /*player.displayClientMessage(Component.translatable(translatableKey, (Object[]) component), false);
-        *///?} elif >= 1.20.1 {
-        player.sendSystemMessage(Component.translatable(translatableKey, (Object[]) component));
-        //?}
+        //? if >= 26.1 {
+        /*player.sendSystemMessage(Component.translatable(translatableKey, (Object[]) component));
+        *///?} elif >=1.21.11 {
+        player.displayClientMessage(Component.translatable(translatableKey, (Object[]) component), false);
+        //?} elif >= 1.20.1 {
+        /*player.sendSystemMessage(Component.translatable(translatableKey, (Object[]) component));
+        *///?}
     }
 
     public static void printReward(String translationKey, int level, int cost) {

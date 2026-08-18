@@ -24,7 +24,7 @@ public class ConfigService {
         if (player == null) return times;
         Inventory inventory = player.getInventory();
         //~ if >= 1.21.11 'getSelected' -> 'getSelectedItem' {
-        ItemStack item = inventory.getSelected();
+        ItemStack item = inventory.getSelectedItem();
         //~}
         List<Enchantment> enchantments = ItemEnchantmentParsingUtils.readStoredEnchantments(item);
         for (var book : enchantments) {
@@ -43,7 +43,7 @@ public class ConfigService {
         LocalPlayer player = instance.player;
         if (player == null) return times;
         //~ if>= 1.21.11 'items' -> 'getNonEquipmentItems()'{
-        NonNullList<ItemStack> stacks = player.getInventory().items;
+        NonNullList<ItemStack> stacks = player.getInventory().getNonEquipmentItems();
         //~}
         for (var item : stacks) {
             var enchantedBooks = ItemEnchantmentParsingUtils.readStoredEnchantments(item);
