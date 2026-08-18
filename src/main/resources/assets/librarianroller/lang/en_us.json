@@ -18,6 +18,7 @@
   "afk.enchant_roller.error.not_found_villager_or_lectern": "Failed to find villager/lectern, please make sure there are sufficient villager/lectern and choose correct mode. The current mode is %1$s",
   "afk.enchant_roller.error.lectern_pickup_failed": "Lectern pickup timed out after multiple attempts, please check the area and try again",
   "afk.enchant_roller.error.lectern_place_failed": "Lectern placement failed after multiple attempts, please check the area and try again",
+  "afk.enchant_roller.error.trade_data_timeout": "Received no villager trade data after interacting; timed out 3 times, roller stopped",
 
   "text.autoconfig.librarianroller.option.autoBuy": "Enable Auto-Buy",
   "text.autoconfig.librarianroller.option.preventAxeBreaking": "Prevent Axe Breaking",
