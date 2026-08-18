@@ -6,7 +6,7 @@ archives_base_name = "Librarian Roller"
 # Mod Properties
 mod.id = "librarianroller"
 mod.name = "Librarian Roller"
-mod.version = "1.2.0"
+mod.version = "1.2.1"
 mod.version_type = "beta"
 mod.description = """
 a pure client-side mod that automates breaking and placing lecterns, causing librarian villagers to continuously refresh their trades for efficient farming of specific enchanted books.
@@ -316,19 +316,39 @@ deps.neoforge_loader = "21.11.42"
 mc.type = "release"
 mc.version = "26.1"
 mc.targets = "26.1 26.1.1 26.1.2"
-mc.latest = true
 loom.platform = "fabric"
 mods.clothconfig.ref = "26.1.154"
 mods.clothconfig.range = ">=26.1.154"
 mods.modmenu.ref = "18.0.0-alpha.8"
 mods.modmenu.range = ">=18.0.0"
+deps.fabric_api = "0.145.1+26.1"
+
 
 ["neoforge-26.1"]
 mc.type = "release"
 mc.version = "26.1"
 mc.targets = "26.1 26.1.1 26.1.2"
-mc.latest = true
 loom.platform = "neoforge"
 mods.clothconfig.ref = "26.1.154"
 mods.clothconfig.range = ">=26.1.154"
 deps.neoforge_loader = "26.1.0.19-beta"
+
+["fabric-26.2"]
+mc.type = "release"
+mc.version = "26.2"
+mc.targets = "26.2"
+loom.platform = "fabric"
+mods.clothconfig.ref = "26.2.155"
+mods.clothconfig.range = ">=26.2.154"
+mods.modmenu.ref = "20.0.1"
+mods.modmenu.range = ">=20.0.1"
+deps.fabric_api = "0.156.0+26.2"
+
+["neoforge-26.2"]
+mc.type = "release"
+mc.version = "26.2"
+mc.targets = "26.2"
+loom.platform = "neoforge"
+mods.clothconfig.ref = "26.2.155"
+mods.clothconfig.range = ">=26.2.154"
+deps.neoforge_loader = "26.2.0.7-beta"

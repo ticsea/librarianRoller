@@ -43,7 +43,7 @@ val isForgeLike = isForge || isNeoForge
 print("the version is: ${mcVersion}")
 val isRemapped = stonecutter.eval(mcVersion, "<26")
 // Java
-val javaSrcVersion = JavaVersion.VERSION_21
+val javaSrcVersion = JavaVersion.VERSION_25
 val javaDstVersion = if (stonecutter.eval(mcVersion, ">=26")) JavaVersion.VERSION_25
 	else if (stonecutter.eval(mcVersion, ">=1.20.5")) JavaVersion.VERSION_21
 	else if (stonecutter.eval(mcVersion, ">=1.18")) JavaVersion.VERSION_17
@@ -157,8 +157,13 @@ dependencies {
 		modImplementation("net.fabricmc:fabric-loader:${required("deps.fabric_loader")}")
 
 		// TickEvent
-		modImplementation(fabricApi.module("fabric-lifecycle-events-v1", required("deps.fabric_api")))
-		modImplementation(fabricApi.module("fabric-key-binding-api-v1", required("deps.fabric_api")))
+		if (sc.current.parsed >= "26.1") {
+			modImplementation(fabricApi.module("fabric-lifecycle-events-v1", required("deps.fabric_api")))
+			modImplementation(fabricApi.module("fabric-key-mapping-api-v1", required("deps.fabric_api")))
+		} else {
+			modImplementation(fabricApi.module("fabric-lifecycle-events-v1", required("deps.fabric_api")))
+			modImplementation(fabricApi.module("fabric-key-binding-api-v1", required("deps.fabric_api")))
+		}
 //		modImplementation(fabricApi.module("fabric-screen-api-v1", required("deps.fabric_api")))
 
 		// ModMenu API

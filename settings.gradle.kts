@@ -74,6 +74,12 @@ stonecutter {
 		// 1.14
 		version("fabric-1.14.4", "1.14.4")*/
 
+		version("fabric-26.2", "26.2")
+		version("neoforge-26.2", "26.2")
+
+		version("fabric-26.1", "26.1")
+		version("neoforge-26.1", "26.1")
+
 		version("fabric-1.21.11", "1.21.11")
 		version("neoforge-1.21.11", "1.21.11")
 
