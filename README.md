@@ -73,9 +73,9 @@
 
 > **Example:**
 > ```
-> Smite 5
-> Sharpness 5
-> Silk Touch
+> minecraft:sharpness 5
+> minecraft:silk_touch 1
+> minecraft:silk_touch
 > ```
 > *Enchantments without a specified level are excluded from the filter list.*
 
@@ -83,6 +83,3 @@
 * This mod modify from CameraOverhaul Mod and inspire by Librarian Trade Finder.
 * https://github.com/Mirsario/Minecraft-CameraOverhaul
 * https://github.com/Greeenman999/LibrarianTradeFinder
-
-## NOTE
-- replace "Please write something"
