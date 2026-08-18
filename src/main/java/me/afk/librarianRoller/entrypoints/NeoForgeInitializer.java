@@ -129,8 +129,13 @@ public class NeoForgeInitializer {
 			MessageUtils.print("afk.enchant_roller.info.added_entry", Component.literal(String.valueOf(i)));
 		}
 		while (OPENCONFIGKEY.get().consumeClick()) {
-			Screen screen = Minecraft.getInstance().screen;
-			Minecraft.getInstance().setScreen(modConfigManager.getConfigScreen(screen));
+			//~ if >= 26.2 'Minecraft.getInstance().screen' -> 'Minecraft.getInstance().gui.screen()' {
+			Screen screen = Minecraft.getInstance().gui.screen();
+			//~}
+
+			//~ if >= 26.2 'setScreen' -> 'setScreenAndShow' {
+			Minecraft.getInstance().setScreenAndShow(modConfigManager.getConfigScreen(screen));
+			//~}
 		}
     }
 }

@@ -13,11 +13,17 @@ import me.afk.librarianRoller.config.ModConfigManager;
 import me.afk.librarianRoller.utils.MessageUtils;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
-//? if >= 1.21.11 {
-/*import net.minecraft.resources.Identifier;
-		*///?}
+		//? if >= 26.1 {
+/*import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.minecraft.resources.Identifier;
+		*///?} else if >= 1.21.11 {
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.resources.Identifier;
+		//?} elif >= 1.20.1 {
+/*import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+
+*///?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -30,42 +36,66 @@ public class FabricClientModInitializer implements ClientModInitializer {
 
 
 	//? if >= 1.21.11 {
-	/*KeyMapping.Category CATEGORY = KeyMapping.Category.register(
+	KeyMapping.Category CATEGORY = KeyMapping.Category.register(
 			Identifier.fromNamespaceAndPath(LibrarianRoller.MOD_ID, "roller")
 	);
-	*///?} else {
-	String CATEGORY = "Librarian Roller";
-	//?}
+	//?} else {
+	/*String CATEGORY = "Librarian Roller";
+	*///?}
 
-	KeyMapping toggleKey = KeyBindingHelper.registerKeyBinding(
-			new KeyMapping(
-					"key.librarianroller.toggle", // The translation key for the key mapping.
-					InputConstants.Type.KEYSYM, // // The type of the keybinding; KEYSYM for keyboard, MOUSE for mouse.
-					GLFW.GLFW_KEY_J, // The GLFW keycode of the key.
-					CATEGORY // The category of the mapping.
-			));
-	KeyMapping addHandEnchantmentKey = KeyBindingHelper.registerKeyBinding(
-			new KeyMapping(
-					"key.librarianroller.add_enchant", // The translation key for the key mapping.
-					InputConstants.Type.KEYSYM, // // The type of the keybinding; KEYSYM for keyboard, MOUSE for mouse.
-					GLFW.GLFW_KEY_K, // The GLFW keycode of the key.
-					CATEGORY // The category of the mapping.
-			));
-	KeyMapping addInventoryEnchantmentKey = KeyBindingHelper.registerKeyBinding(
-			new KeyMapping(
-					"key.librarianroller.add_inventory_enchantment", // The translation key for the key mapping.
-					InputConstants.Type.KEYSYM, // // The type of the keybinding; KEYSYM for keyboard, MOUSE for mouse.
-					GLFW.GLFW_KEY_KP_5, // The GLFW keycode of the key.
-					CATEGORY // The category of the mapping.
-			));
-	KeyMapping openConfigKey = KeyBindingHelper.registerKeyBinding(
-			new KeyMapping(
-					"key.librarianroller.open_config", // The translation key for the key mapping.
-					InputConstants.Type.KEYSYM, // // The type of the keybinding; KEYSYM for keyboard, MOUSE for mouse.
-					GLFW.GLFW_KEY_L, // The GLFW keycode of the key.
-					CATEGORY // The category of the mapping.
-			));
+	KeyMapping toggleKey = keymapping(
+			"key.librarianroller.toggle",
+			InputConstants.Type.KEYSYM,
+			GLFW.GLFW_KEY_J,
+			CATEGORY
+	);
+	KeyMapping addHandEnchantmentKey = keymapping(
+			"key.librarianroller.add_enchant",
+			InputConstants.Type.KEYSYM,
+			GLFW.GLFW_KEY_K,
+			CATEGORY
+	);
+	KeyMapping addInventoryEnchantmentKey = keymapping(
+			"key.librarianroller.add_inventory_enchantment",
+			InputConstants.Type.KEYSYM,
+			GLFW.GLFW_KEY_KP_5,
+			CATEGORY
+	);
+	KeyMapping openConfigKey = keymapping(
+			"key.librarianroller.open_config",
+			InputConstants.Type.KEYSYM,
+			GLFW.GLFW_KEY_L,
+			CATEGORY
+	);
 
+
+	private KeyMapping keymapping(
+			final String name,
+			final InputConstants.Type type,
+			final int value,
+			//~ if >= 1.21.11 'String' -> 'KeyMapping.Category' {
+			final KeyMapping.Category category) {
+		//~}
+		//? if >= 26.1 {
+		/*return KeyMappingHelper.registerKeyMapping(
+				new KeyMapping(
+						name,
+						type,
+						value,
+						category
+				)
+		);
+		*///?} else {
+		return KeyBindingHelper.registerKeyBinding(
+				new KeyMapping(
+						name,
+						type,
+						value,
+						category
+				)
+		);
+		//?}
+	}
 
 	private void key() {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -81,8 +111,13 @@ public class FabricClientModInitializer implements ClientModInitializer {
 				MessageUtils.print("afk.enchant_roller.info.added_entry", Component.literal(String.valueOf(i)));
 			}
 			while (openConfigKey.consumeClick()) {
+				//~ if >= 26.2 'Minecraft.getInstance().screen' -> 'Minecraft.getInstance().gui.screen()' {
 				Screen screen = Minecraft.getInstance().screen;
+				//~}
+
+				//~ if >= 26.2 'setScreen' -> 'setScreenAndShow' {
 				Minecraft.getInstance().setScreen(modConfigManager.getConfigScreen(screen));
+				//~}
 			}
 		});
 	}
@@ -101,7 +136,7 @@ public class FabricClientModInitializer implements ClientModInitializer {
 	}
 
 	private void doAction() {
-		ClientTickEvents.END_WORLD_TICK.register( minecraft -> {
+		ClientTickEvents.END_CLIENT_TICK.register( minecraft -> {
 			rollercontext.doAction();
 		});
 	}
