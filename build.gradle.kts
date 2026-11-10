@@ -354,3 +354,19 @@ publishMods {
 listOf(tasks.build, tasks.clean, tasks.publishMods).forEach {
 	it.get().group = "_project"
 }
+
+stonecutter {
+	replacements.string(current.parsed >= "26.3") {
+		if (isFabric) {
+			replace("InputConstants.Type.KEYSYM", "InputConstants.Type.KEYBOARD")
+			replace("GLFW.GLFW_KEY_J", "InputConstants.KEY_J")
+			replace("GLFW.GLFW_KEY_K", "InputConstants.KEY_K")
+			replace("GLFW.GLFW_KEY_L", "InputConstants.KEY_L")
+			replace("GLFW.GLFW_KEY_KP_5", "InputConstants.KEY_NUMPAD5")
+		}
+
+		if (isNeoForge) {
+			replace("InputConstants.Type.KEYSYM", "InputConstants.Type.KEYBOARD")
+		}
+	}
+}

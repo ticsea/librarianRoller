@@ -70,8 +70,8 @@ public class ForgeInitializer {
 					"key.librarianroller.toggle",            // 按键的显示名称（本地化键名）
 					KeyConflictContext.IN_GAME,      // 仅在游戏中生效，而非GUI界面
 					KeyModifier.NONE,                // 默认无组合键
-					InputConstants.Type.KEYSYM,      // 输入类型为键盘
-					GLFW.GLFW_KEY_J,                 // 默认按键为 O
+					InputConstants.Type.KEYBOARD,      // 输入类型为键盘
+					InputConstants.KEY_J,                 // 默认按键为 O
 					KEY_CATEGORY             // 在控制菜单中所属的分类b
 			)
 	);
@@ -80,8 +80,8 @@ public class ForgeInitializer {
 					"key.librarianroller.add_enchant",            // 按键的显示名称（本地化键名）
 					KeyConflictContext.IN_GAME,      // 仅在游戏中生效，而非GUI界面
 					KeyModifier.NONE,                // 默认无组合键
-					InputConstants.Type.KEYSYM,      // 输入类型为键盘
-					GLFW.GLFW_KEY_K,                 // 默认按键为 O
+					InputConstants.Type.KEYBOARD,      // 输入类型为键盘
+					InputConstants.KEY_K,                 // 默认按键为 O
 					KEY_CATEGORY             // 在控制菜单中所属的分类b
 			)
 	);
@@ -90,8 +90,8 @@ public class ForgeInitializer {
 					"key.librarianroller.add_inventory_enchantment",            // 按键的显示名称（本地化键名）
 					KeyConflictContext.IN_GAME,      // 仅在游戏中生效，而非GUI界面
 					KeyModifier.NONE,                // 默认无组合键
-					InputConstants.Type.KEYSYM,      // 输入类型为键盘
-					GLFW.GLFW_KEY_L,                 // 默认按键为 O
+					InputConstants.Type.KEYBOARD,      // 输入类型为键盘
+					InputConstants.KEY_L,                 // 默认按键为 O
 					KEY_CATEGORY             // 在控制菜单中所属的分类b
 			)
 	);
@@ -100,8 +100,8 @@ public class ForgeInitializer {
 					"key.librarianroller.open_config",            // 按键的显示名称（本地化键名）
 					KeyConflictContext.IN_GAME,      // 仅在游戏中生效，而非GUI界面
 					KeyModifier.NONE,                // 默认无组合键
-					InputConstants.Type.KEYSYM,      // 输入类型为键盘
-					GLFW.GLFW_KEY_KP_5,                 // 默认按键为 O
+					InputConstants.Type.KEYBOARD,      // 输入类型为键盘
+					InputConstants.KEY_KP_5,                 // 默认按键为 O
 					KEY_CATEGORY             // 在控制菜单中所属的分类b
 			)
 	);

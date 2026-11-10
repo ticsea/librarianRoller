@@ -16,6 +16,7 @@ import net.minecraft.world.entity.npc.villager.Villager;
 
 /*import net.minecraft.world.entity.npc.Villager;
         *///?}
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -89,7 +90,11 @@ public class RollerPhaseInteract implements IRollerPhase {
         // the resulting OpenScreen (the roller runs headless).
         long epoch = transitions.getScreenIntent().set(ScreenIntent.Mode.CANCEL);
         InteractionResult result = InteractionUtils.interactVillager(player, villager);
-        player.swing(InteractionHand.MAIN_HAND);
+        //? if < 26.3 {
+        /*player.swing(InteractionHand.MAIN_HAND);
+        *///?} else {
+        player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+        //?}
 
         if (result == InteractionResult.SUCCESS) {
             // The OpenScreen packet is expected to be consumed by the Mixin.

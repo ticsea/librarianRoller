@@ -9,6 +9,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LecternBlock;
 
@@ -67,7 +68,11 @@ public class RollerPhaseBreak implements IRollerPhase {
 
         if (block instanceof LecternBlock) {
             if (interactionManager.continueDestroyBlock(lecternPos, Direction.UP)) {
-                player.swing(InteractionHand.MAIN_HAND);
+                //? if < 26.3 {
+                /*player.swing(InteractionHand.MAIN_HAND);
+                 *///?} else {
+                player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+                //?}
             }
             // Still destroying - do not count pickup-wait ticks.
             return RollerEvent.of(RollerEvent.Type.BREAKING);

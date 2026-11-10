@@ -16,9 +16,9 @@ public class InteractionUtils {
         if (gameMode == null) return InteractionResult.FAIL;
 
         //? if >= 26.1 {
-        /*return gameMode.interact(player, villager, new EntityHitResult(villager), InteractionHand.MAIN_HAND);
-        *///?} else {
-        return gameMode.interact(player, villager, InteractionHand.MAIN_HAND);
-        //?}
+        return gameMode.interact(player, villager, new EntityHitResult(villager), InteractionHand.MAIN_HAND);
+        //?} else {
+        /*return gameMode.interact(player, villager, InteractionHand.MAIN_HAND);
+        *///?}
     }
 }

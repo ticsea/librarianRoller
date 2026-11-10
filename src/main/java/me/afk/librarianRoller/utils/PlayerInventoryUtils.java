@@ -12,10 +12,15 @@ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.inventory.ContainerInput;
+        //? if < 26.3 {
+/*import net.minecraft.world.item.AxeItem;
+        *///?} else {
+import net.minecraft.tags.ItemTags;
+        //?}
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,11 +37,14 @@ public class PlayerInventoryUtils {
     private static final int HOTBAR_SIZE = 9;
 
     public static boolean swapAxe(LocalPlayer player) {
-        if (!PlayerInventoryUtils.swapItem(player, EquipmentSlot.MAINHAND, itemHere -> itemHere instanceof AxeItem)) {
+        //? if < 26.3 {
+        /*if (!PlayerInventoryUtils.swapItem(player, EquipmentSlot.MAINHAND, itemHere -> itemHere instanceof AxeItem)) {
+            *///?} else {
+            if (!PlayerInventoryUtils.swapItem(player, EquipmentSlot.MAINHAND, itemHere -> itemHere.builtInRegistryHolder().is(ItemTags.AXES))) {
+             //?}
             MessageUtils.throwError("afk.enchant_roller.error.not_found_axe");
             return false;
         }
-
         return true;
     }
 
@@ -45,13 +53,14 @@ public class PlayerInventoryUtils {
 
         var stack = player.getMainHandItem();
 
-        if (!(stack.getItem() instanceof AxeItem)) {
+        //? if < 26.3 {
+        /*if (!(stack.getItem() instanceof AxeItem)) {
+            *///?} else {
+            if (!stack.is(ItemTags.AXES)) {
+             //?}
             MessageUtils.throwError("afk.enchant_roller.error.is_not_axe");
-//            transitions.stop();
-
-//            return shouldStop;
             return true;
-        };
+        }
 
         if (modConfig.preventAxeBreaking) {
             int i = stack.getMaxDamage() - stack.getDamageValue();
@@ -64,6 +73,18 @@ public class PlayerInventoryUtils {
 
         return false;
     }
+
+    //? if >= 26.3 {
+    private static boolean isAxe(Item item) {
+        return item == Items.WOODEN_AXE ||
+                item == Items.STONE_AXE ||
+                item == Items.COPPER_AXE ||
+                item == Items.IRON_AXE ||
+                item == Items.GOLDEN_AXE ||
+                item == Items.DIAMOND_AXE ||
+                item == Items.NETHERITE_AXE;
+    }
+    //?}
 
     public static boolean swapItem(LocalPlayer player, EquipmentSlot handSlot, Predicate<Item> predicate) {
         boolean success = false;
@@ -122,14 +143,14 @@ public class PlayerInventoryUtils {
                     player.containerMenu.containerId,
                     i,
                     0,
-                    ClickType.PICKUP,
+                    ContainerInput.PICKUP,
                     player
             );
             containerInput(
                     player.containerMenu.containerId,
                     targetSlot,
                     0,
-                    ClickType.PICKUP,
+                    ContainerInput.PICKUP,
                     player
             );
 
@@ -138,7 +159,7 @@ public class PlayerInventoryUtils {
                         player.containerMenu.containerId,
                         i,
                         0,
-                        ClickType.PICKUP,
+                        ContainerInput.PICKUP,
                         player
                 );
             }
@@ -157,16 +178,16 @@ public class PlayerInventoryUtils {
             int containerId,
             int slot,
             int button,
-            ClickType action,
+            ContainerInput action,
             LocalPlayer player
     ) {
         MultiPlayerGameMode gameMode = Minecraft.getInstance().gameMode;
         if (gameMode == null) return;
         //? if >= 26.1 {
-        /*gameMode.handleClickType(containerId, slot, button, action, player);
-        *///?} else {
-        gameMode.handleInventoryMouseClick(containerId, slot, button, action, player);
-        //?}
+        gameMode.handleContainerInput(containerId, slot, button, action, player);
+        //?} else {
+        /*gameMode.handleInventoryMouseClick(containerId, slot, button, action, player);
+        *///?}
     }
 
     public static void containerInput(
@@ -178,10 +199,10 @@ public class PlayerInventoryUtils {
         MultiPlayerGameMode gameMode = Minecraft.getInstance().gameMode;
         if (gameMode == null) return;
         //? if >= 26.1 {
-        /*gameMode.handleClickType(containerId, slot, button, ClickType.PICKUP, player);
-        *///?} else {
-        gameMode.handleInventoryMouseClick(containerId, slot, button, ClickType.PICKUP, player);
-         //?}
+        gameMode.handleContainerInput(containerId, slot, button, ContainerInput.PICKUP, player);
+        //?} else {
+        /*gameMode.handleInventoryMouseClick(containerId, slot, button, ContainerInput.PICKUP, player);
+         *///?}
     }
 
     private static boolean swapFromHotbar(LocalPlayer player, EquipmentSlot handSlot, Predicate<Item> predicate) {

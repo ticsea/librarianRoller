@@ -12,6 +12,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -24,6 +26,7 @@ import java.util.List;
  * emits events; the context owns the counter increments and failure handling.
  */
 public class RollerPhasePlace implements IRollerPhase {
+
     private static final int MAX_PICKUP_WAIT_TICKS = 40;
     private static final int MAX_PLACE_FAILURES = 8;
 
@@ -75,7 +78,8 @@ public class RollerPhasePlace implements IRollerPhase {
 
         var result = interactionManager.useItemOn(player, InteractionHand.OFF_HAND, hitResult);
 
-        if (result == InteractionResult.SUCCESS) {
+        // 注意：此处可能有不兼容版本的写法
+        if (result instanceof InteractionResult.Success) {
             // The context resets both the place-failure counter and the consecutive-failure
             // counter here, then advances to the next villager.
             return RollerEvent.of(RollerEvent.Type.PLACE_SUCCESS);

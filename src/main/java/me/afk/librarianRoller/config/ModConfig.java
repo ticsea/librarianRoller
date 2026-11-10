@@ -1,14 +1,9 @@
 package me.afk.librarianRoller.config;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import me.afk.librarianRoller.LibrarianRoller;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
-import me.shedaniel.clothconfig2.api.Modifier;
-import me.shedaniel.clothconfig2.api.ModifierKeyCode;
-import me.shedaniel.clothconfig2.impl.builders.KeyCodeBuilder;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;

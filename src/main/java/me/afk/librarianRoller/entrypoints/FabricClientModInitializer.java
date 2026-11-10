@@ -15,19 +15,21 @@ import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.KeyMapping;
 		//? if >= 26.1 {
-/*import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.resources.Identifier;
-		*///?} else if >= 1.21.11 {
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+		//?} else if >= 1.21.11 {
+/*import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.resources.Identifier;
-		//?} elif >= 1.20.1 {
+		*///?} elif >= 1.20.1 {
 /*import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 
 *///?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
+//? if < 26.3 {
+/*import org.lwjgl.glfw.GLFW;
+*///?}
 
 @SuppressWarnings("unused")
 public class FabricClientModInitializer implements ClientModInitializer {
@@ -45,26 +47,26 @@ public class FabricClientModInitializer implements ClientModInitializer {
 
 	KeyMapping toggleKey = keymapping(
 			"key.librarianroller.toggle",
-			InputConstants.Type.KEYSYM,
-			GLFW.GLFW_KEY_J,
+			InputConstants.Type.KEYBOARD,
+			InputConstants.KEY_J,
 			CATEGORY
 	);
 	KeyMapping addHandEnchantmentKey = keymapping(
 			"key.librarianroller.add_enchant",
-			InputConstants.Type.KEYSYM,
-			GLFW.GLFW_KEY_K,
+			InputConstants.Type.KEYBOARD,
+			InputConstants.KEY_K,
 			CATEGORY
 	);
 	KeyMapping addInventoryEnchantmentKey = keymapping(
 			"key.librarianroller.add_inventory_enchantment",
-			InputConstants.Type.KEYSYM,
-			GLFW.GLFW_KEY_KP_5,
+			InputConstants.Type.KEYBOARD,
+			InputConstants.KEY_NUMPAD5,
 			CATEGORY
 	);
 	KeyMapping openConfigKey = keymapping(
 			"key.librarianroller.open_config",
-			InputConstants.Type.KEYSYM,
-			GLFW.GLFW_KEY_L,
+			InputConstants.Type.KEYBOARD,
+			InputConstants.KEY_L,
 			CATEGORY
 	);
 
@@ -77,7 +79,7 @@ public class FabricClientModInitializer implements ClientModInitializer {
 			final KeyMapping.Category category) {
 		//~}
 		//? if >= 26.1 {
-		/*return KeyMappingHelper.registerKeyMapping(
+		return KeyMappingHelper.registerKeyMapping(
 				new KeyMapping(
 						name,
 						type,
@@ -85,8 +87,8 @@ public class FabricClientModInitializer implements ClientModInitializer {
 						category
 				)
 		);
-		*///?} else {
-		return KeyBindingHelper.registerKeyBinding(
+		//?} else {
+		/*return KeyBindingHelper.registerKeyBinding(
 				new KeyMapping(
 						name,
 						type,
@@ -94,7 +96,7 @@ public class FabricClientModInitializer implements ClientModInitializer {
 						category
 				)
 		);
-		//?}
+		*///?}
 	}
 
 	private void key() {
@@ -112,11 +114,11 @@ public class FabricClientModInitializer implements ClientModInitializer {
 			}
 			while (openConfigKey.consumeClick()) {
 				//~ if >= 26.2 'Minecraft.getInstance().screen' -> 'Minecraft.getInstance().gui.screen()' {
-				Screen screen = Minecraft.getInstance().screen;
+				Screen screen = Minecraft.getInstance().gui.screen();
 				//~}
 
 				//~ if >= 26.2 'setScreen' -> 'setScreenAndShow' {
-				Minecraft.getInstance().setScreen(modConfigManager.getConfigScreen(screen));
+				Minecraft.getInstance().setScreenAndShow(modConfigManager.getConfigScreen(screen));
 				//~}
 			}
 		});
